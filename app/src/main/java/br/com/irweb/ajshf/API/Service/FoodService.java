@@ -72,6 +72,9 @@ public class FoodService {
 
             return new Gson().fromJson(content, t);
         }
+        else if(response.code() == HttpURLConnection.HTTP_NOT_FOUND){
+            return null;
+        }
 
         ApiException ex = new ApiException();
         ex.setStatusCode(response.code());
