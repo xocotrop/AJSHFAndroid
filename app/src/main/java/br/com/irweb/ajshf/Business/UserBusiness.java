@@ -11,6 +11,7 @@ import br.com.irweb.ajshf.API.Entities.GenerateTokenResponse;
 import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.API.Service.UserService;
 import br.com.irweb.ajshf.Application.AJSHFApp;
+import br.com.irweb.ajshf.Entities.Client;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 
 /**
@@ -46,9 +47,8 @@ public class UserBusiness {
         try {
             GenerateTokenResponse userAuth = service.Auth(login, password);
 
-            User me = GetMe(userAuth.tokenType, userAuth.accessToken);
 
-            UserAuthAJSHF authAJSHF = createUserAuth(userAuth, me);
+            UserAuthAJSHF authAJSHF = createUserAuth(userAuth);
 
             String serialize = new Gson().toJson(userAuth);
 
@@ -67,19 +67,19 @@ public class UserBusiness {
     }
 
     @NonNull
-    private UserAuthAJSHF createUserAuth(GenerateTokenResponse userAuth, User me) {
+    private UserAuthAJSHF createUserAuth(GenerateTokenResponse userAuth) {
         UserAuthAJSHF authAJSHF = new UserAuthAJSHF();
-        authAJSHF.token = userAuth.accessToken;
+        authAJSHF.accessToken = userAuth.accessToken;
         authAJSHF.tokenType = userAuth.tokenType;
-        authAJSHF.Email = me.Email;
-        authAJSHF.Id = me.Id;
-        authAJSHF.LastName = me.LastName;
-        authAJSHF.Name = me.Name;
-        authAJSHF.ReceiveUpdates = me.ReceiveUpdates;
+        authAJSHF.Email = userAuth.Email;
+        authAJSHF.Id = userAuth.Id;
+        authAJSHF.LastName = userAuth.LastName;
+        authAJSHF.Name = userAuth.Name;
+        authAJSHF.ReceiveUpdates = userAuth.ReceiveUpdates;
         return authAJSHF;
     }
 
-    public User GetMe(String tokeType, String token) throws ApiException {
+    public Client GetMe(String tokeType, String token) throws ApiException {
         return service.getMe(tokeType, token);
 
     }

@@ -37,6 +37,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
 
     public void setFoods(List<Food> foods) {
         mFoods = foods;
+        notifyDataSetChanged();
     }
 
     @Override

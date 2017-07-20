@@ -28,31 +28,20 @@ public class MainActivity extends AppCompatActivity {
             AndroidUtils.generateHash(this);
         }
 
-        if (VerifyIsLogged()) return;
+        VerifyIsLogged();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
     }
 
-    private boolean VerifyIsLogged() {
+    private void VerifyIsLogged() {
         UserAuthAJSHF user = AJSHFApp.getInstance().getUser();
         if(user == null){
-
-
             Intent it = new Intent(this, LoginActivity.class);
 
             startActivity(it);
 
             finish();
-            return true;
         }
-        return false;
     }
 
     @Override

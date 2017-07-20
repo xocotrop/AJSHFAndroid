@@ -43,6 +43,11 @@ public class AJSHFApp extends Application {
         LoadUserLogged();
     }
 
+    public void Logout(){
+        clearPreferences(getBaseContext());
+        user = null;
+    }
+
     public void setUserToken(UserAuthAJSHF userToken) {
         this.user = userToken;
     }
@@ -72,8 +77,10 @@ public class AJSHFApp extends Application {
                 .build();
 
 
+
         retrofit = new Retrofit
                 .Builder()
+
                 .baseUrl(BuildConfig.URL)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())

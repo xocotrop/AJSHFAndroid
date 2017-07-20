@@ -11,8 +11,8 @@ import java.util.Date;
 public class GenerateTokenResponse {
     @SerializedName("access_token")
     public String accessToken;
-    @SerializedName("refresh_token")
-    public String refreshToken;
+//    @SerializedName("refresh_token")
+//    public String refreshToken;
     @SerializedName("token_type")
     public String tokenType;
     @SerializedName("expires_in")
@@ -23,8 +23,8 @@ public class GenerateTokenResponse {
     public String Email;
     public String ReceiveUpdates;
     @SerializedName(".issued")
-    public Date Issued;
+    public String Issued;
     @SerializedName(".expires")
-    public Date Expires;
+    public String Expires;
 
 }

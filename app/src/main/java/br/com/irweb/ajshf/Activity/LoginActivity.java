@@ -44,7 +44,7 @@ import java.util.List;
 
 import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.Business.UserBusiness;
-import br.com.irweb.ajshf.MainActivity;
+import br.com.irweb.ajshf.MainAJSActivity;
 import br.com.irweb.ajshf.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -385,7 +385,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
 
-                Intent it = new Intent(getBaseContext(), MainActivity.class);
+                Intent it = new Intent(getBaseContext(), MainAJSActivity.class);
                 startActivity(it);
 
                 finish();
