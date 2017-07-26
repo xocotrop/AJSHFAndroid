@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.squareup.picasso.Picasso;
 
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +42,16 @@ public class AJSHFApp extends Application {
         createInstance();
 
         LoadUserLogged();
+
+        initPicasso();
+    }
+
+    private void initPicasso(){
+        Picasso.Builder builder = new Picasso.Builder(this);
+        Picasso p = builder.build();
+        Picasso.setSingletonInstance(p);
+        p.setIndicatorsEnabled(BuildConfig.DEBUG);
+
     }
 
     public void Logout(){

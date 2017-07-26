@@ -26,6 +26,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
     private Context mContext;
     private List<Food> mFoods;
     private LayoutInflater inflater;
+    private ItemAdapterBtnClick itemAdapterBtnClick;
 
     public MenuItemViewHolderAdapter(Context context, List<Food> foods) {
         mContext = context;
@@ -33,6 +34,10 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
         if (foods != null) {
             mFoods = foods;
         }
+    }
+
+    public void setItemAdapterBtnClick(ItemAdapterBtnClick itemAdapterBtnClick){
+        this.itemAdapterBtnClick = itemAdapterBtnClick;
     }
 
     public void setFoods(List<Food> foods) {
@@ -55,12 +60,12 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
 
         holder.title.setText(f.Title);
         holder.img.setImageDrawable(null);
-        holder.btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+//        holder.btnAdd.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
     }
 
     @Override
@@ -68,14 +73,14 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
         return mFoods != null ? mFoods.size() : 0;
     }
 
-    public static class FoodViewHolder extends RecyclerView.ViewHolder {
+    public class FoodViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView img;
         private TextView title;
         private Button btnAdd;
         private EditText itemQuantity;
         private CardView cardView;
 
-        public FoodViewHolder(View itemView) {
+        public FoodViewHolder(final View itemView) {
             super(itemView);
 
             img = (ImageView) itemView.findViewById(R.id.img);
@@ -83,6 +88,19 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
             btnAdd = (Button) itemView.findViewById(R.id.addButton);
             itemQuantity = (EditText) itemView.findViewById(R.id.itemQuantity);
             cardView = (CardView) itemView.findViewById(R.id.itemCard);
+
+            btnAdd.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            if(itemAdapterBtnClick != null){
+                itemAdapterBtnClick.onClick(getAdapterPosition());
+            }
+        }
+    }
+
+    public interface ItemAdapterBtnClick{
+        void onClick(int position);
     }
 }
