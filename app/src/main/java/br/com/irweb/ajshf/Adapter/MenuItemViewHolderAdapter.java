@@ -36,7 +36,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
         }
     }
 
-    public void setItemAdapterBtnClick(ItemAdapterBtnClick itemAdapterBtnClick){
+    public void setItemAdapterBtnClick(ItemAdapterBtnClick itemAdapterBtnClick) {
         this.itemAdapterBtnClick = itemAdapterBtnClick;
     }
 
@@ -90,17 +90,25 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
             cardView = (CardView) itemView.findViewById(R.id.itemCard);
 
             btnAdd.setOnClickListener(this);
+            cardView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            if(itemAdapterBtnClick != null){
-                itemAdapterBtnClick.onClick(getAdapterPosition());
+            if (v instanceof Button) {
+                if (itemAdapterBtnClick != null) {
+                    itemAdapterBtnClick.onClickBtn(getAdapterPosition());
+                }
+            } else if (v instanceof CardView) {
+                if (itemAdapterBtnClick != null) {
+                    itemAdapterBtnClick.onClickCard(getAdapterPosition());
+                }
             }
         }
     }
 
-    public interface ItemAdapterBtnClick{
-        void onClick(int position);
+    public interface ItemAdapterBtnClick {
+        void onClickBtn(int position);
+        void onClickCard(int position);
     }
 }

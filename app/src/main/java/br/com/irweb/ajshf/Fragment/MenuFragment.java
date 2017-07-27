@@ -86,10 +86,16 @@ public class MenuFragment extends Fragment {
         adapter = new MenuItemViewHolderAdapter(getContext(), null);
         adapter.setItemAdapterBtnClick(new MenuItemViewHolderAdapter.ItemAdapterBtnClick() {
             @Override
-            public void onClick(int position) {
+            public void onClickBtn(int position) {
                 Food f = mFoods.get(position);
                 Toast.makeText(getContext(), f.Title, Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onClickCard(int position) {
+                showDialogFood(position);
+            }
+
         });
         recyclerViewMenu.setAdapter(adapter);
         recyclerViewMenu.setHasFixedSize(true);
@@ -108,18 +114,18 @@ public class MenuFragment extends Fragment {
             }
 
         });
-        recyclerViewMenu.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), recyclerViewMenu, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-
-                showDialogFood(position);
-            }
-
-            @Override
-            public void onLongItemClick(View view, int position) {
-
-            }
-        }));
+//        recyclerViewMenu.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), recyclerViewMenu, new RecyclerItemClickListener.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(View view, int position) {
+//
+//                showDialogFood(position);
+//            }
+//
+//            @Override
+//            public void onLongItemClick(View view, int position) {
+//
+//            }
+//        }));
 
         return v;
     }

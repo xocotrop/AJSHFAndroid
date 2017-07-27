@@ -6,11 +6,12 @@
     android:layout_margin="10dp"
     app:cardCornerRadius="10dp"
     android:id="@+id/itemCard"
+    android:clickable="true"
     android:layout_height="wrap_content">
 
 
     <LinearLayout
-
+        android:id="@+id/linearItem"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_margin="5dp"
