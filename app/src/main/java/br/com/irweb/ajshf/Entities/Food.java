@@ -15,7 +15,7 @@ public class Food implements Serializable {
     public String Title;
     public boolean Enable;
     public String Description;
-    public double Value;
+    public float Value;
     public Date Start;
     public Date End;
     public String Image;

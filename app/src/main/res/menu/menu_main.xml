@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="br.com.irweb.ajshf.MainActivity">
     <item
+        android:icon="@drawable/ic_shopping_cart_black_24dp"
         android:id="@+id/action_settings"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:actionLayout="@layout/layout_action_cart"
+        android:title="@string/action_cart"
+        app:showAsAction="always" />
 </menu>

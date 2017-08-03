@@ -97,7 +97,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
         public void onClick(View v) {
             if (v instanceof Button) {
                 if (itemAdapterBtnClick != null) {
-                    itemAdapterBtnClick.onClickBtn(getAdapterPosition());
+                    itemAdapterBtnClick.onClickBtn(getAdapterPosition(), Integer.parseInt(itemQuantity.getText().toString()));
                 }
             } else if (v instanceof CardView) {
                 if (itemAdapterBtnClick != null) {
@@ -108,7 +108,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
     }
 
     public interface ItemAdapterBtnClick {
-        void onClickBtn(int position);
+        void onClickBtn(int position, int quantity);
         void onClickCard(int position);
     }
 }

@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,16 +18,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import br.com.irweb.ajshf.Activity.LoginActivity;
 import br.com.irweb.ajshf.Application.AJSHFApp;
+import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import br.com.irweb.ajshf.Fragment.MenuFragment;
 
 public class MainAJSActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private LinearLayout fragmentReplace;
+    private TextView cartTotalView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +42,6 @@ public class MainAJSActivity extends AppCompatActivity
             return;
         }
 
-        fragmentReplace = (LinearLayout) findViewById(R.id.replace_fragment);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -58,6 +60,15 @@ public class MainAJSActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+    }
+
+
+
+    public void updateViewCart(){
+        Order order = AJSHFApp.getOrder();
+        if(order != null)
+            cartTotalView.setText(String.format("R$ %s", order.TotalValue));
     }
 
     private boolean VerifyIsLogged() {
@@ -91,6 +102,13 @@ public class MainAJSActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_aj, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.action_cart);
+        View v = MenuItemCompat.getActionView(menuItem);
+        cartTotalView = (TextView) v.findViewById(R.id.cart_total);
+
+        updateViewCart();
+
         return true;
     }
 
@@ -115,7 +133,7 @@ public class MainAJSActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_menu) {
+        if (id == R.id.action_cart) {
             // Handle the camera action
         } else if (id == R.id.nav_orders) {
 
@@ -125,6 +143,8 @@ public class MainAJSActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             AJSHFApp.getInstance().Logout();
+
+            AJSHFApp.clearOrder();
 
             ShowLoginActivity();
 
@@ -136,4 +156,5 @@ public class MainAJSActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 }

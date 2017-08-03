@@ -34,6 +34,7 @@ import br.com.irweb.ajshf.Adapter.MenuItemViewHolderAdapter;
 import br.com.irweb.ajshf.Entities.Food;
 import br.com.irweb.ajshf.Helpers.StringHelper;
 import br.com.irweb.ajshf.R;
+import br.com.irweb.ajshf.Service.CartService;
 
 public class MenuFragment extends Fragment {
 
@@ -41,6 +42,7 @@ public class MenuFragment extends Fragment {
     private MenuItemViewHolderAdapter adapter;
     private FoodService service;
     private List<Food> mFoods;
+    private CartService cartService;
 
 
     private OnFragmentInteractionListener mListener;
@@ -58,6 +60,7 @@ public class MenuFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         service = new FoodService(getContext());
+        cartService = new CartService(getContext());
         if (getArguments() != null) {
 
         }
@@ -86,9 +89,16 @@ public class MenuFragment extends Fragment {
         adapter = new MenuItemViewHolderAdapter(getContext(), null);
         adapter.setItemAdapterBtnClick(new MenuItemViewHolderAdapter.ItemAdapterBtnClick() {
             @Override
-            public void onClickBtn(int position) {
+            public void onClickBtn(int position, int quantity) {
                 Food f = mFoods.get(position);
-                Toast.makeText(getContext(), f.Title, Toast.LENGTH_SHORT).show();
+                try {
+                    cartService.addItemOrder(f, quantity);
+                    Toast.makeText(getContext(), String.format("%s adicionado com sucesso ao carrinho", f.Title), Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    if (e.getMessage() == "Food is null") {
+                        Toast.makeText(getContext(), "Houve um erro ao adicionar o Item no carrinho", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
 
             @Override
@@ -136,7 +146,7 @@ public class MenuFragment extends Fragment {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.food_detail_popup, null, false);
         ImageView img = (ImageView) v.findViewById(R.id.img);
         TextView txt = (TextView) v.findViewById(R.id.text);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             txt.setText(Html.fromHtml(f.Description, Html.FROM_HTML_MODE_LEGACY));
         } else {
             txt.setText(Html.fromHtml(f.Description));

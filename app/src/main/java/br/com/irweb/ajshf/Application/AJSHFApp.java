@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso;
 import java.util.concurrent.TimeUnit;
 
 import br.com.irweb.ajshf.BuildConfig;
+import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -28,6 +29,20 @@ public class AJSHFApp extends Application {
     private Retrofit retrofit;
     private static AJSHFApp instance;
     private static UserAuthAJSHF user;
+    private static Order order;
+
+    public static Order getOrder(){
+        if(order == null){
+            order = new Order();
+        }
+        return order;
+    }
+
+    public static void clearOrder(){
+        if(order != null){
+            order = null;
+        }
+    }
 
     public static AJSHFApp getInstance() {
         return instance;
