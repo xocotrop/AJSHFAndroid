@@ -143,13 +143,9 @@ public class MainAJSActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             AJSHFApp.getInstance().Logout();
-
             AJSHFApp.clearOrder();
-
             ShowLoginActivity();
-
             finish();
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
