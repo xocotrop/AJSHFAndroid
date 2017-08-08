@@ -12,12 +12,16 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
+import java.util.List;
 
 import br.com.irweb.ajshf.API.AccountClient;
+import br.com.irweb.ajshf.API.AddressClient;
 import br.com.irweb.ajshf.API.Entities.GenerateTokenResponse;
 import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.Application.AJSHFApp;
+import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.Entities.Client;
+import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -32,11 +36,44 @@ public class UserService {
     private Retrofit retrofit;
     private AccountClient accountClient;
     private Context context;
+    private AddressClient addressClient;
+    private UserAuthAJSHF userAuthAJSHF;
 
     public UserService(Context context) {
         this.context = context;
         retrofit = AJSHFApp.getInstance().getRetrofit();
         accountClient = retrofit.create(AccountClient.class);
+        addressClient = retrofit.create(AddressClient.class);
+        LoadUser();
+    }
+
+    public void LoadUser() {
+        userAuthAJSHF = AJSHFApp.getInstance().getUser();
+    }
+
+    public List<Address> getAddress() throws Exception {
+        if (userAuthAJSHF != null) {
+            String auth = String.format("%s %s", userAuthAJSHF.tokenType, userAuthAJSHF.accessToken);
+            Call<ResponseBody> address = addressClient.getAddress(auth);
+            Response<ResponseBody> response = address.execute();
+
+            if(response.code() == HttpURLConnection.HTTP_OK){
+
+                Type t = new TypeToken<List<Address>>() {
+                }.getType();
+
+                return new Gson().fromJson(response.body().string(), t);
+
+            } else {
+                return  null;
+            }
+        }
+        LoadUser();
+        if (userAuthAJSHF == null) {
+            throw new Exception("Not logged");
+        }
+
+        return null;
     }
 
     public String createUser(Client client) throws Exception {
@@ -50,7 +87,7 @@ public class UserService {
                 String str = response.body().string();
                 JSONObject jsonObject = new JSONObject(str);
                 String id = jsonObject.getString("id");
-                return  id;
+                return id;
             } else {
                 String str = response.errorBody().string();
                 throw new Exception(str);

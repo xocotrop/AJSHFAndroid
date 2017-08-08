@@ -14,6 +14,7 @@ import br.com.irweb.ajshf.API.OrderClient;
 import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Entities.Client;
 import br.com.irweb.ajshf.Entities.Order;
+import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -27,22 +28,52 @@ public class OrderService {
     private Retrofit retrofit;
     private OrderClient orderClient;
     private Context context;
+    private String userToken;
+    private UserAuthAJSHF user;
+    private Order order;
 
-    public OrderService(OrderClient orderClient, Context context) {
-        this.orderClient = orderClient;
+    public OrderService(Context context) {
         this.context = context;
         retrofit = AJSHFApp.getInstance().getRetrofit();
+        orderClient = retrofit.create(OrderClient.class);
+
+        user = AJSHFApp.getInstance().getUser();
+        order = AJSHFApp.getOrder();
     }
 
+    public int createOrder() throws Exception {
+        Call<ResponseBody> order = orderClient.postOrder(this.order, getUserToken());
+
+        Response<ResponseBody> orderExecute = order.execute();
+
+        if (orderExecute.code() == HttpURLConnection.HTTP_CREATED) {
+            for (int i = 0; i < orderExecute.headers().size(); i++) {
+
+                return Integer.parseInt(orderExecute.headers().get("Location"));
+
+            }
+        } else {
+            throw new Exception(orderExecute.errorBody().string());
+        }
+        return 0;
+    }
+
+    private String getUserToken() {
+        if (userToken != null) {
+            return userToken;
+        }
+        userToken = String.format("%s %s", user.tokenType, user.accessToken);
+        return userToken;
+    }
 
     public List<Order> getOrders() throws IOException {
-        String auth = "Bearer ctR6d3rCQxbzPtlQ-8KYS-4xy-Caa1JHADpCJP-rJ9hPS17JUm-fBp_Lc_M3oZkOeAal_Ef8kwAVKEYQHPu42G4zb10x5n1mKqRiKGYOW_8kjynleEJJ06yhRhTSTp86j7M9yzn1yElpJoY-X3VJwXQ1Eij_Xtw0k_lYZfjBMa04H77JTMIMJMdp3QTwdzxCVBOyb0ETt4xPOEltcjvMc1UkJRpiFi-kaxM21BRkrlreDePy6lve-sO-SO3-_pZD";
-        Call<ResponseBody> client = orderClient.getOrders(auth);
+
+        Call<ResponseBody> client = orderClient.getOrders(getUserToken());
 
         try {
             Response<ResponseBody> response = client.execute();
 
-            if(response.code() == HttpURLConnection.HTTP_OK){
+            if (response.code() == HttpURLConnection.HTTP_OK) {
                 Type t = new TypeToken<List<Order>>() {
                 }.getType();
                 return new Gson().fromJson(response.body().string(), t);
@@ -57,13 +88,12 @@ public class OrderService {
     }
 
     public List<Order> getOrders(int idOrder) throws IOException {
-        String auth = "Bearer ctR6d3rCQxbzPtlQ-8KYS-4xy-Caa1JHADpCJP-rJ9hPS17JUm-fBp_Lc_M3oZkOeAal_Ef8kwAVKEYQHPu42G4zb10x5n1mKqRiKGYOW_8kjynleEJJ06yhRhTSTp86j7M9yzn1yElpJoY-X3VJwXQ1Eij_Xtw0k_lYZfjBMa04H77JTMIMJMdp3QTwdzxCVBOyb0ETt4xPOEltcjvMc1UkJRpiFi-kaxM21BRkrlreDePy6lve-sO-SO3-_pZD";
-        Call<ResponseBody> client = orderClient.getOrder(idOrder, auth);
+        Call<ResponseBody> client = orderClient.getOrder(idOrder, getUserToken());
 
         try {
             Response<ResponseBody> response = client.execute();
 
-            if(response.code() == HttpURLConnection.HTTP_OK){
+            if (response.code() == HttpURLConnection.HTTP_OK) {
                 Type t = new TypeToken<List<Order>>() {
                 }.getType();
                 return new Gson().fromJson(response.body().string(), t);

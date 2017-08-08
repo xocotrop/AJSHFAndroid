@@ -6,11 +6,14 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.List;
 
 import br.com.irweb.ajshf.API.Entities.GenerateTokenResponse;
 import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.API.Service.UserService;
 import br.com.irweb.ajshf.Application.AJSHFApp;
+import br.com.irweb.ajshf.Entities.Address;
+import br.com.irweb.ajshf.Entities.AddressUserAJSHF;
 import br.com.irweb.ajshf.Entities.Client;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 
@@ -22,6 +25,7 @@ public class UserBusiness {
 
     private UserService service;
     private Context context;
+
 
     public UserBusiness(Context context) {
         this.context = context;
@@ -50,20 +54,36 @@ public class UserBusiness {
 
             UserAuthAJSHF authAJSHF = createUserAuth(userAuth);
 
-            String serialize = new Gson().toJson(userAuth);
+            String serialize = new Gson().toJson(authAJSHF);
 
             AJSHFApp.getInstance().setUserToken(authAJSHF);
-            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERTOKEN, serialize);
+            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERADDRESSTOKEN, serialize);
+
+            List<Address> addresses = service.getAddress();
+
+            AddressUserAJSHF addressUserAJSHF = createAddress(addresses);
+
+            String addressSerialize = new Gson().toJson(addressUserAJSHF);
+
+            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERADDRESSTOKEN, addressSerialize);
+            AJSHFApp.getInstance().setADdressUserToken(addressUserAJSHF);
 
             return true;
         } catch (ApiException e) {
             e.printStackTrace();
             throw e;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return false;
+    }
+
+    @NonNull
+    private AddressUserAJSHF createAddress(List<Address> addresses) {
+        AddressUserAJSHF addressUserAJSHF = new AddressUserAJSHF();
+        addressUserAJSHF.addresses = addresses;
+        return addressUserAJSHF;
     }
 
     @NonNull

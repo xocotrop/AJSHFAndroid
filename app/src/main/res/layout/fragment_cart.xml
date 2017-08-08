@@ -6,19 +6,18 @@
     tools:context="br.com.irweb.ajshf.Fragment.CartFragment">
 
     <!-- TODO: Update blank fragment layout -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list_items"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="10"></android.support.v7.widget.RecyclerView>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Carrinho" />
 
-
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list_items"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_weight="10"
-        android:layout_height="0dp"></android.support.v7.widget.RecyclerView>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -36,6 +35,7 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                android:id="@+id/btn_close_order"
                 android:layout_gravity="right|center_vertical"
                 android:text="Fechar Pedido"
                 android:layout_width="wrap_content"

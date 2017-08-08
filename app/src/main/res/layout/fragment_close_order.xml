@@ -20,27 +20,75 @@
             android:text="Colocar aqui o picker data" />
 
         <RadioGroup
-            android:gravity="center"
-            android:padding="10dp"
-            android:orientation="horizontal"
             android:id="@+id/group"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
 
             <RadioButton
+                android:id="@+id/radio_manha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Manhã" />
 
             <RadioButton
+                android:id="@+id/radio_tarde"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tarde" />
         </RadioGroup>
 
+        <TextView
+            android:text="Endereço:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
         <Spinner
+            android:id="@+id/select_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"></Spinner>
+
+        <TextView
+            android:text="Método de pagamento:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/select_method_payment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"></Spinner>
+
+        <EditText
+            android:id="@+id/change_money"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Troco para:"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/text_observation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Observação: Ex. Entregas entre às 08h e 12h"
+            android:lines="4" />
+
+        <CheckBox
+            android:id="@+id/pickup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retirar no local" />
+
+        <TextView
+            android:id="@+id/text_pickup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rua doutor Alexandre Gutierrez, 80 (Água Verde)" />
+
+        <Button
+            android:id="@+id/btn_finish_order"
+            android:text="Fechar pedido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </FrameLayout>

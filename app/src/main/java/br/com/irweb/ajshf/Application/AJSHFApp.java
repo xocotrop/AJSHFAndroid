@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso;
 import java.util.concurrent.TimeUnit;
 
 import br.com.irweb.ajshf.BuildConfig;
+import br.com.irweb.ajshf.Entities.AddressUserAJSHF;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import okhttp3.OkHttpClient;
@@ -25,21 +26,23 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AJSHFApp extends Application {
     public static final String PREF_USERTOKEN = "userToken";
+    public static final String PREF_USERADDRESSTOKEN = "userAddress";
     private static final String PREF_FILE_NAME = "prefApplication";
     private Retrofit retrofit;
     private static AJSHFApp instance;
     private static UserAuthAJSHF user;
+    private static AddressUserAJSHF address;
     private static Order order;
 
-    public static Order getOrder(){
-        if(order == null){
+    public static Order getOrder() {
+        if (order == null) {
             order = new Order();
         }
         return order;
     }
 
-    public static void clearOrder(){
-        if(order != null){
+    public static void clearOrder() {
+        if (order != null) {
             order = null;
         }
     }
@@ -61,7 +64,7 @@ public class AJSHFApp extends Application {
         initPicasso();
     }
 
-    private void initPicasso(){
+    private void initPicasso() {
         Picasso.Builder builder = new Picasso.Builder(this);
         Picasso p = builder.build();
         Picasso.setSingletonInstance(p);
@@ -69,7 +72,7 @@ public class AJSHFApp extends Application {
 
     }
 
-    public void Logout(){
+    public void Logout() {
         clearPreferences(getBaseContext());
         user = null;
     }
@@ -78,30 +81,41 @@ public class AJSHFApp extends Application {
         this.user = userToken;
     }
 
-    public UserAuthAJSHF getUser(){
+    public void setADdressUserToken(AddressUserAJSHF addressToken) {
+        this.address = addressToken;
+    }
+
+    public AddressUserAJSHF getAddressUser() {
+        return address;
+    }
+
+    public UserAuthAJSHF getUser() {
         return user;
     }
 
     private void LoadUserLogged() {
         String userToken = readFromPreference(this, PREF_USERTOKEN, null);
+        String addressToken = readFromPreference(this, PREF_USERADDRESSTOKEN, null);
         if (userToken != null) {
             try {
                 Gson gson = new Gson();
                 user = gson.fromJson(userToken, UserAuthAJSHF.class);
+                if (addressToken != null) {
+                    address = gson.fromJson(addressToken, AddressUserAJSHF.class);
+                }
             } catch (JsonSyntaxException ex) {
                 Log.e("Error parseJson", ex.getMessage());
             }
         }
     }
 
-    private void initRetrofit(){
+    private void initRetrofit() {
 
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
-
 
 
         retrofit = new Retrofit
@@ -117,7 +131,7 @@ public class AJSHFApp extends Application {
         return retrofit;
     }
 
-    private void createInstance(){
+    private void createInstance() {
         instance = this;
     }
 
