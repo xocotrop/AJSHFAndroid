@@ -105,9 +105,16 @@ public class MainAJSActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_aj, menu);
 
-        MenuItem menuItem = menu.findItem(R.id.action_cart);
+        final MenuItem menuItem = menu.findItem(R.id.action_cart);
         View v = MenuItemCompat.getActionView(menuItem);
         cartTotalView = (TextView) v.findViewById(R.id.cart_total);
+
+        menuItem.getActionView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(menuItem);
+            }
+        });
 
         updateViewCart();
 

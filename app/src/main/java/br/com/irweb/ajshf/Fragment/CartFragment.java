@@ -3,12 +3,14 @@ package br.com.irweb.ajshf.Fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import br.com.irweb.ajshf.Adapter.ItemCartAdapter;
 import br.com.irweb.ajshf.R;
 
 /**
@@ -18,6 +20,7 @@ public class CartFragment extends Fragment {
 
     private Button btnCloseOrder;
     private RecyclerView itemsCart;
+    private ItemCartAdapter itemCartAdapter;
 
     public CartFragment() {
         // Required empty public constructor
@@ -38,6 +41,10 @@ public class CartFragment extends Fragment {
 
         btnCloseOrder = (Button) v.findViewById(R.id.btn_close_order);
         itemsCart = (RecyclerView) v.findViewById(R.id.list_items);
+
+        itemCartAdapter = new ItemCartAdapter(getContext());
+        itemsCart.setAdapter(itemCartAdapter);
+        itemsCart.setLayoutManager(new LinearLayoutManager(getContext()));
 
         return v;
     }
