@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import br.com.irweb.ajshf.Entities.Food;
@@ -59,7 +61,8 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
         Food f = mFoods.get(position);
 
         holder.title.setText(f.Title);
-        holder.img.setImageDrawable(null);
+//        holder.img.setImageDrawable(null);
+        Picasso.with(mContext).load(f.Image).fit().into(holder.img);
 //        holder.btnAdd.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {

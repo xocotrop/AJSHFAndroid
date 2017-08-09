@@ -50,6 +50,7 @@
                 android:orientation="horizontal">
 
                 <EditText
+                    android:text="0"
                     android:id="@+id/itemQuantity"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

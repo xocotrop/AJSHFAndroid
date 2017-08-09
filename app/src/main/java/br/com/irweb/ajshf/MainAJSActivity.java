@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
@@ -24,6 +25,7 @@ import br.com.irweb.ajshf.Activity.LoginActivity;
 import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
+import br.com.irweb.ajshf.Fragment.CartFragment;
 import br.com.irweb.ajshf.Fragment.MenuFragment;
 
 public class MainAJSActivity extends AppCompatActivity
@@ -135,6 +137,14 @@ public class MainAJSActivity extends AppCompatActivity
 
         if (id == R.id.action_cart) {
             // Handle the camera action
+            Fragment fragment = CartFragment.newIstance();
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+            transaction.replace(R.id.replace_fragment, fragment, "cart");
+            transaction.commit();
+
         } else if (id == R.id.nav_orders) {
 
         } else if (id == R.id.nav_profile) {

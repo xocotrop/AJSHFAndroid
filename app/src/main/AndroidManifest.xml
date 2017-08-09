@@ -26,6 +26,7 @@
 
         </activity>
         <activity
+            android:windowSoftInputMode="stateVisible|adjustPan"
             android:name=".Activity.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
