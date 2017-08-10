@@ -57,7 +57,7 @@ public class UserBusiness {
             String serialize = new Gson().toJson(authAJSHF);
 
             AJSHFApp.getInstance().setUserToken(authAJSHF);
-            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERADDRESSTOKEN, serialize);
+            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERTOKEN, serialize);
 
             List<Address> addresses = service.getAddress();
 

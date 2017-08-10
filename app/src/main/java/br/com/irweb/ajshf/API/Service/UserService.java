@@ -37,23 +37,21 @@ public class UserService {
     private AccountClient accountClient;
     private Context context;
     private AddressClient addressClient;
-    private UserAuthAJSHF userAuthAJSHF;
 
     public UserService(Context context) {
         this.context = context;
         retrofit = AJSHFApp.getInstance().getRetrofit();
         accountClient = retrofit.create(AccountClient.class);
         addressClient = retrofit.create(AddressClient.class);
-        LoadUser();
+
     }
 
-    public void LoadUser() {
-        userAuthAJSHF = AJSHFApp.getInstance().getUser();
-    }
+
 
     public List<Address> getAddress() throws Exception {
-        if (userAuthAJSHF != null) {
-            String auth = String.format("%s %s", userAuthAJSHF.tokenType, userAuthAJSHF.accessToken);
+
+        if (AJSHFApp.getInstance().getUser() != null) {
+            String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
             Call<ResponseBody> address = addressClient.getAddress(auth);
             Response<ResponseBody> response = address.execute();
 
@@ -68,8 +66,7 @@ public class UserService {
                 return  null;
             }
         }
-        LoadUser();
-        if (userAuthAJSHF == null) {
+        if (AJSHFApp.getInstance().getUser() == null) {
             throw new Exception("Not logged");
         }
 

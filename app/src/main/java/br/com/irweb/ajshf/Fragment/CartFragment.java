@@ -27,7 +27,7 @@ public class CartFragment extends Fragment {
     }
 
     public static CartFragment newIstance(){
-        CartFragment fragment = newIstance();
+        CartFragment fragment = new CartFragment();
 
         return fragment;
     }

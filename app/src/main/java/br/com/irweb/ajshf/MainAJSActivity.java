@@ -40,7 +40,7 @@ public class MainAJSActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if(!VerifyIsLogged()){
+        if (!VerifyIsLogged()) {
             return;
         }
 
@@ -66,10 +66,9 @@ public class MainAJSActivity extends AppCompatActivity
     }
 
 
-
-    public void updateViewCart(){
+    public void updateViewCart() {
         Order order = AJSHFApp.getOrder();
-        if(order != null)
+        if (order != null)
             cartTotalView.setText(String.format("R$ %s", order.TotalValue));
     }
 
@@ -131,6 +130,18 @@ public class MainAJSActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_cart) {
+            // Handle the camera action
+            Fragment fragment = CartFragment.newIstance();
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+            transaction.replace(R.id.replace_fragment, fragment, "cart");
+            transaction.addToBackStack("cart");
+            transaction.commit();
+            return true;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -142,14 +153,14 @@ public class MainAJSActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.action_cart) {
+        if (id == R.id.nav_menu) {
             // Handle the camera action
-            Fragment fragment = CartFragment.newIstance();
+            Fragment fragment = MenuFragment.newInstance();
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-            transaction.replace(R.id.replace_fragment, fragment, "cart");
+            transaction.replace(R.id.replace_fragment, fragment, "menu");
             transaction.commit();
 
         } else if (id == R.id.nav_orders) {
