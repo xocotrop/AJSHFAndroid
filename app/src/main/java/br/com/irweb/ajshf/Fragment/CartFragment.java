@@ -10,7 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import org.greenrobot.eventbus.EventBus;
+
 import br.com.irweb.ajshf.Adapter.ItemCartAdapter;
+import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.R;
 
 /**
@@ -26,7 +29,19 @@ public class CartFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static CartFragment newIstance(){
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    public static CartFragment newIstance() {
         CartFragment fragment = new CartFragment();
 
         return fragment;
@@ -46,7 +61,23 @@ public class CartFragment extends Fragment {
         itemsCart.setAdapter(itemCartAdapter);
         itemsCart.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        btnCloseOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MessageBus bus = new MessageBus();
+                bus.className = CartFragment.class + "";
+                bus.message = "fecharPedido";
+                EventBus.getDefault().post(bus);
+
+            }
+        });
+
         return v;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+    }
 }

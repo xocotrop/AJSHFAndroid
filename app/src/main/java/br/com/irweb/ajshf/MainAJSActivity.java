@@ -21,17 +21,38 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import br.com.irweb.ajshf.Activity.LoginActivity;
 import br.com.irweb.ajshf.Application.AJSHFApp;
+import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import br.com.irweb.ajshf.Fragment.CartFragment;
+import br.com.irweb.ajshf.Fragment.CloseOrderFragment;
 import br.com.irweb.ajshf.Fragment.MenuFragment;
 
 public class MainAJSActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private TextView cartTotalView;
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageBus bus){
+        if(bus.className.equalsIgnoreCase(CartFragment.class+"")){
+            if(bus.message.equalsIgnoreCase("fecharPedido")){
+                Fragment frag = CloseOrderFragment.newInstance();
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                transaction.replace(R.id.replace_fragment, frag, "closerOrder");
+                transaction.addToBackStack("closeOrder");
+                transaction.commit();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

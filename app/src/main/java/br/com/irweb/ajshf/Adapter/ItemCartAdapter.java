@@ -78,7 +78,6 @@ public class ItemCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void onClick(View v) {
             _order.Items.remove(getAdapterPosition());
             notifyDataSetChanged();
-
         }
     }
 }
