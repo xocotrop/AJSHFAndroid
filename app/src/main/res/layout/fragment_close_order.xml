@@ -28,12 +28,14 @@
             android:padding="10dp">
 
             <RadioButton
+                android:checked="true"
                 android:id="@+id/radio_manha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Manhã" />
 
             <RadioButton
+                android:checked="false"
                 android:id="@+id/radio_tarde"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -79,6 +81,7 @@
             android:text="Retirar no local" />
 
         <TextView
+            android:visibility="invisible"
             android:id="@+id/text_pickup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

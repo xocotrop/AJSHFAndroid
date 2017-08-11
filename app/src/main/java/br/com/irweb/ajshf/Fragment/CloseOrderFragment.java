@@ -1,11 +1,12 @@
 package br.com.irweb.ajshf.Fragment;
 
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +32,6 @@ import br.com.irweb.ajshf.Entities.AddressUserAJSHF;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.PaymentMethod;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
-import br.com.irweb.ajshf.Helpers.StringHelper;
 import br.com.irweb.ajshf.R;
 
 /**
@@ -38,18 +41,21 @@ public class CloseOrderFragment extends Fragment {
 
     private RadioButton radioManha;
     private RadioButton radioTarde;
+    private RadioGroup radioGroup;
     private Spinner spinnerAddress;
     private Spinner spinnerMethodPayment;
     private EditText editTextChangeMoney;
     private EditText editTextObservation;
     private CheckBox checkBoxPickup;
     private Button btnFinishOrder;
+    private TextView textPickup;
 
     private Order mOrder;
     private UserAuthAJSHF user;
     private AddressUserAJSHF addressUserAJSHF;
 
     private OrderService orderService;
+    private AlertDialog loadingDialog;
 
 
     public CloseOrderFragment() {
@@ -82,11 +88,29 @@ public class CloseOrderFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        createAlertDialog();
+    }
+
+    private void createAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Aguarde");
+        builder.setMessage("Estamos preparando a sua encomenda =). Aguarde mais um instante.");
+
+        loadingDialog = builder.create();
+    }
+
     private void setupButtonFinish() {
         btnFinishOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Tasks().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                if (!validateOrder()) {
+                    return;
+                }
+                new Tasks(getContext()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
 
@@ -108,6 +132,11 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mOrder.Pickup = isChecked;
+                if (isChecked) {
+                    textPickup.setVisibility(View.VISIBLE);
+                } else {
+                    textPickup.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
@@ -138,6 +167,29 @@ public class CloseOrderFragment extends Fragment {
         });
 
 
+    }
+
+    private boolean validateOrder() {
+        boolean error = false;
+        if (mOrder.Items == null || mOrder.Items.size() > 0) {
+            Toast.makeText(getContext(), "Nenhum Item adicionado", Toast.LENGTH_SHORT).show();
+            error = true;
+        }
+        if (mOrder.Address != null) {
+            Toast.makeText(getContext(), "Deve ser selecionado um endereço", Toast.LENGTH_SHORT).show();
+            error = true;
+        }
+        if (mOrder.PaymentMethod == 0) {
+            if (mOrder.ChangeOfMoney <= 0) {
+                Toast.makeText(getContext(), "Qual o valor para troco?", Toast.LENGTH_SHORT).show();
+                error = true;
+            }
+        }
+
+        if (error)
+            return false;
+
+        return true;
     }
 
     private void initAdapter() {
@@ -175,20 +227,28 @@ public class CloseOrderFragment extends Fragment {
         editTextObservation = (EditText) v.findViewById(R.id.text_observation);
         checkBoxPickup = (CheckBox) v.findViewById(R.id.pickup);
         btnFinishOrder = (Button) v.findViewById(R.id.btn_finish_order);
+        textPickup = (TextView) v.findViewById(R.id.text_pickup);
+        radioGroup = (RadioGroup) v.findViewById(R.id.group);
     }
 
     private class Tasks extends AsyncTask<Void, Void, Void> {
-
+        private Context _context;
         int orderId;
+
+        public Tasks(Context context) {
+            _context = context;
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            loadingDialog.show();
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            loadingDialog.dismiss();
         }
 
         @Override
@@ -198,6 +258,7 @@ public class CloseOrderFragment extends Fragment {
                 orderId = orderService.createOrder();
             } catch (Exception e) {
                 e.printStackTrace();
+                Toast.makeText(_context, "Houve algum erro ao gerara seu pedido =(", Toast.LENGTH_SHORT).show();
             }
 
             return null;
