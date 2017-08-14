@@ -48,8 +48,12 @@ public class OrderService {
 
         if (orderExecute.code() == HttpURLConnection.HTTP_CREATED) {
             for (int i = 0; i < orderExecute.headers().size(); i++) {
+                String location = orderExecute.headers().get("Location");
 
-                return Integer.parseInt(orderExecute.headers().get("Location"));
+                assert location != null;
+
+                String[] urlSplit = location.split("/");
+                return Integer.parseInt(urlSplit[urlSplit.length - 1]);
 
             }
         } else {

@@ -21,10 +21,9 @@ public class Order {
     public int PromotionId;
     public float ValueDiscountPromotion;
     public Date DeliveryDate;
-    public int IdAddress;
-    public Address Address;
-    public int IdNeighborhood;
-    public int IdCity;
+    public Integer IdAddress;
+    //public Address Address;
+    public Integer IdNeighborhood;
     public List<ItemOrder> Items;
     public String Observation;
 }

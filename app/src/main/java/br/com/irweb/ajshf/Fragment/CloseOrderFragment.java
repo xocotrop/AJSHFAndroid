@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -49,6 +50,7 @@ public class CloseOrderFragment extends Fragment {
     private CheckBox checkBoxPickup;
     private Button btnFinishOrder;
     private TextView textPickup;
+    private ImageView imgPickupDelivery;
 
     private Order mOrder;
     private UserAuthAJSHF user;
@@ -107,6 +109,7 @@ public class CloseOrderFragment extends Fragment {
         btnFinishOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mOrder.Observation = editTextObservation.getText().toString();
                 if (!validateOrder()) {
                     return;
                 }
@@ -134,8 +137,14 @@ public class CloseOrderFragment extends Fragment {
                 mOrder.Pickup = isChecked;
                 if (isChecked) {
                     textPickup.setVisibility(View.VISIBLE);
+                    mOrder.IdAddress = null;
+                    mOrder.IdNeighborhood = null;
+                    imgPickupDelivery.setImageResource(R.drawable.if_backpack_icon_1741326);
                 } else {
                     textPickup.setVisibility(View.INVISIBLE);
+                    mOrder.IdAddress = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdAddress;
+                    mOrder.IdNeighborhood = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdNeighborhood;
+                    imgPickupDelivery.setImageResource(R.drawable.if_truck_1054949);
                 }
             }
         });
@@ -144,6 +153,11 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mOrder.PaymentMethod = position;
+                if(position == 0){
+                    editTextChangeMoney.setVisibility(View.VISIBLE);
+                } else {
+                    editTextChangeMoney.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -171,11 +185,11 @@ public class CloseOrderFragment extends Fragment {
 
     private boolean validateOrder() {
         boolean error = false;
-        if (mOrder.Items == null || mOrder.Items.size() > 0) {
+        if (mOrder.Items == null || mOrder.Items.size() == 0) {
             Toast.makeText(getContext(), "Nenhum Item adicionado", Toast.LENGTH_SHORT).show();
             error = true;
         }
-        if (mOrder.Address != null) {
+        if (mOrder.IdAddress == null) {
             Toast.makeText(getContext(), "Deve ser selecionado um endereço", Toast.LENGTH_SHORT).show();
             error = true;
         }
@@ -186,18 +200,16 @@ public class CloseOrderFragment extends Fragment {
             }
         }
 
-        if (error)
-            return false;
+        return !error;
 
-        return true;
     }
 
     private void initAdapter() {
         String[] adrs = getAddresses();
-        ArrayAdapter adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, adrs);
+        ArrayAdapter adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, adrs);
         spinnerAddress.setAdapter(adapter);
 
-        ArrayAdapter adapterPayment = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, PaymentMethod.METHODS);
+        ArrayAdapter adapterPayment = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, PaymentMethod.METHODS);
         spinnerMethodPayment.setAdapter(adapterPayment);
     }
 
@@ -218,6 +230,10 @@ public class CloseOrderFragment extends Fragment {
         orderService = new OrderService(getContext());
     }
 
+    private void hideDialog(){
+        loadingDialog.dismiss();
+    }
+
     private void initViews(View v) {
         radioManha = (RadioButton) v.findViewById(R.id.radio_manha);
         radioTarde = (RadioButton) v.findViewById(R.id.radio_tarde);
@@ -229,6 +245,7 @@ public class CloseOrderFragment extends Fragment {
         btnFinishOrder = (Button) v.findViewById(R.id.btn_finish_order);
         textPickup = (TextView) v.findViewById(R.id.text_pickup);
         radioGroup = (RadioGroup) v.findViewById(R.id.group);
+        imgPickupDelivery = (ImageView) v.findViewById(R.id.image_pickup_delivery);
     }
 
     private class Tasks extends AsyncTask<Void, Void, Void> {
@@ -248,7 +265,7 @@ public class CloseOrderFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            loadingDialog.dismiss();
+            hideDialog();
         }
 
         @Override
