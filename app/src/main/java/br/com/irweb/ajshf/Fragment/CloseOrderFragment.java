@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
+import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import br.com.irweb.ajshf.API.Service.OrderService;
@@ -51,6 +57,9 @@ public class CloseOrderFragment extends Fragment {
     private Button btnFinishOrder;
     private TextView textPickup;
     private ImageView imgPickupDelivery;
+    private Button btnDate;
+    private TextView txtDateSelected;
+    private Calendar mCalendar;
 
     private Order mOrder;
     private UserAuthAJSHF user;
@@ -106,6 +115,57 @@ public class CloseOrderFragment extends Fragment {
     }
 
     private void setupButtonFinish() {
+
+        btnDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Calendar now = Calendar.getInstance();
+                now.add(Calendar.DAY_OF_MONTH, 1);
+
+                MonthAdapter.CalendarDay minDate = new MonthAdapter.CalendarDay(now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH));
+
+                CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
+                        .setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+                                mCalendar = Calendar.getInstance();
+                                mCalendar.set(year,monthOfYear,dayOfMonth);
+
+                                txtDateSelected.setText(String.format("%s/%s/%s", dayOfMonth, monthOfYear+1, year));
+
+                                mOrder.DeliveryDate = mCalendar.getTime();
+                                Log.d("data", mCalendar.getTime() + "");
+                            }
+                        })
+                        .setFirstDayOfWeek(Calendar.SUNDAY)
+                        .setPreselectedDate(now.get(Calendar.YEAR),
+                                            now.get(Calendar.MONTH),
+                                            now.get(Calendar.DAY_OF_MONTH))
+                        .setDateRange(minDate, null)
+                        .setDoneText("Aplicar")
+                        .setCancelText("Cancelar");
+
+                cdp.show(getChildFragmentManager(), "picker");
+
+                /*Calendar now = Calendar.getInstance();
+                now.add(Calendar.DAY_OF_MONTH, 1);
+                DatePickerDialog dpd = DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+
+                            }
+                        },
+                        now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH));
+                dpd.show(getFragmentManager(), "dialog");*/
+
+            }
+        });
+
         btnFinishOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -235,6 +295,7 @@ public class CloseOrderFragment extends Fragment {
     }
 
     private void initViews(View v) {
+        txtDateSelected = (TextView) v.findViewById(R.id.date_selected);
         radioManha = (RadioButton) v.findViewById(R.id.radio_manha);
         radioTarde = (RadioButton) v.findViewById(R.id.radio_tarde);
         spinnerAddress = (Spinner) v.findViewById(R.id.select_address);
@@ -246,6 +307,7 @@ public class CloseOrderFragment extends Fragment {
         textPickup = (TextView) v.findViewById(R.id.text_pickup);
         radioGroup = (RadioGroup) v.findViewById(R.id.group);
         imgPickupDelivery = (ImageView) v.findViewById(R.id.image_pickup_delivery);
+        btnDate = (Button) v.findViewById(R.id.btn_date);
     }
 
     private class Tasks extends AsyncTask<Void, Void, Void> {
