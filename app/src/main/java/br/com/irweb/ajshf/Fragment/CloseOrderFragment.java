@@ -26,7 +26,8 @@ import android.widget.Toast;
 
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
-import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,6 +35,7 @@ import java.util.List;
 
 import br.com.irweb.ajshf.API.Service.OrderService;
 import br.com.irweb.ajshf.Application.AJSHFApp;
+import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.Entities.AddressUserAJSHF;
 import br.com.irweb.ajshf.Entities.Order;
@@ -132,9 +134,9 @@ public class CloseOrderFragment extends Fragment {
                             @Override
                             public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
                                 mCalendar = Calendar.getInstance();
-                                mCalendar.set(year,monthOfYear,dayOfMonth);
+                                mCalendar.set(year, monthOfYear, dayOfMonth);
 
-                                txtDateSelected.setText(String.format("%s/%s/%s", dayOfMonth, monthOfYear+1, year));
+                                txtDateSelected.setText(String.format("%s/%s/%s", dayOfMonth, monthOfYear + 1, year));
 
                                 mOrder.DeliveryDate = mCalendar.getTime();
                                 Log.d("data", mCalendar.getTime() + "");
@@ -142,8 +144,8 @@ public class CloseOrderFragment extends Fragment {
                         })
                         .setFirstDayOfWeek(Calendar.SUNDAY)
                         .setPreselectedDate(now.get(Calendar.YEAR),
-                                            now.get(Calendar.MONTH),
-                                            now.get(Calendar.DAY_OF_MONTH))
+                                now.get(Calendar.MONTH),
+                                now.get(Calendar.DAY_OF_MONTH))
                         .setDateRange(minDate, null)
                         .setDoneText("Aplicar")
                         .setCancelText("Cancelar");
@@ -213,7 +215,7 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mOrder.PaymentMethod = position;
-                if(position == 0){
+                if (position == 0) {
                     editTextChangeMoney.setVisibility(View.VISIBLE);
                 } else {
                     editTextChangeMoney.setVisibility(View.GONE);
@@ -290,8 +292,15 @@ public class CloseOrderFragment extends Fragment {
         orderService = new OrderService(getContext());
     }
 
-    private void hideDialog(){
+    private void hideDialog() {
         loadingDialog.dismiss();
+    }
+
+    private void finalizeOk() {
+        MessageBus bus = new MessageBus();
+        bus.className = CloseOrderFragment.class + "";
+        bus.message = "pedidoFechado";
+        EventBus.getDefault().post(bus);
     }
 
     private void initViews(View v) {
@@ -313,6 +322,7 @@ public class CloseOrderFragment extends Fragment {
     private class Tasks extends AsyncTask<Void, Void, Void> {
         private Context _context;
         int orderId;
+        boolean error = false;
 
         public Tasks(Context context) {
             _context = context;
@@ -328,6 +338,9 @@ public class CloseOrderFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             hideDialog();
+            if (!error) {
+                finalizeOk();
+            }
         }
 
         @Override
@@ -338,6 +351,7 @@ public class CloseOrderFragment extends Fragment {
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(_context, "Houve algum erro ao gerara seu pedido =(", Toast.LENGTH_SHORT).show();
+                error = true;
             }
 
             return null;

@@ -9,4 +9,5 @@ import br.com.irweb.ajshf.Helpers.StringHelper;
 public class MessageBus {
     public String className;
     public String message;
+    public String additionalInfo;
 }

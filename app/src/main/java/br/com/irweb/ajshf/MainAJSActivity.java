@@ -33,6 +33,7 @@ import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import br.com.irweb.ajshf.Fragment.CartFragment;
 import br.com.irweb.ajshf.Fragment.CloseOrderFragment;
 import br.com.irweb.ajshf.Fragment.MenuFragment;
+import br.com.irweb.ajshf.Fragment.OrderOkFragment;
 
 public class MainAJSActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -62,6 +63,29 @@ public class MainAJSActivity extends AppCompatActivity
 
                 transaction.replace(R.id.replace_fragment, frag, "closerOrder");
                 transaction.addToBackStack("closeOrder");
+                transaction.commit();
+            }
+        }
+        else if(bus.className.equalsIgnoreCase(CloseOrderFragment.class+"")){
+            if(bus.message.equalsIgnoreCase("pedidoFechado")){
+                Fragment frag = OrderOkFragment.newInstance(bus.additionalInfo);
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                transaction.replace(R.id.replace_fragment, frag, "finishOrder");
+                transaction.commit();
+            }
+        }
+        else if(bus.className.equalsIgnoreCase(OrderOkFragment.class+"")){
+            if(bus.message.equalsIgnoreCase("MenuInicial")){
+
+                Fragment frag = MenuFragment.newInstance();
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                transaction.replace(R.id.replace_fragment, frag, "menu");
                 transaction.commit();
             }
         }
