@@ -49,15 +49,34 @@
                 android:layout_marginTop="20dp"
                 android:orientation="horizontal">
 
+                <Button
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:text="-"
+                    android:id="@+id/btn_minus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
                 <EditText
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textAlignment="center"
                     android:text="0"
                     android:id="@+id/itemQuantity"
+                    android:layout_weight="1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:hint="Quantidade"
                     android:inputType="number"
                     android:textSize="12sp" />
+
+                <Button
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:text="+"
+                    android:id="@+id/btn_plus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
                 <Button
                     android:id="@+id/addButton"

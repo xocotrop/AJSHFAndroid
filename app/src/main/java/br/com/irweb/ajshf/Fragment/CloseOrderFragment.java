@@ -62,6 +62,7 @@ public class CloseOrderFragment extends Fragment {
     private Button btnDate;
     private TextView txtDateSelected;
     private Calendar mCalendar;
+    private TextView textLblAddress;
 
     private Order mOrder;
     private UserAuthAJSHF user;
@@ -152,19 +153,6 @@ public class CloseOrderFragment extends Fragment {
 
                 cdp.show(getChildFragmentManager(), "picker");
 
-                /*Calendar now = Calendar.getInstance();
-                now.add(Calendar.DAY_OF_MONTH, 1);
-                DatePickerDialog dpd = DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-
-                            }
-                        },
-                        now.get(Calendar.YEAR),
-                        now.get(Calendar.MONTH),
-                        now.get(Calendar.DAY_OF_MONTH));
-                dpd.show(getFragmentManager(), "dialog");*/
-
             }
         });
 
@@ -202,11 +190,19 @@ public class CloseOrderFragment extends Fragment {
                     mOrder.IdAddress = null;
                     mOrder.IdNeighborhood = null;
                     imgPickupDelivery.setImageResource(R.drawable.if_backpack_icon_1741326);
+                    spinnerAddress.setVisibility(View.GONE);
+                    mOrder.IdNeighborhood = null;
+                    mOrder.IdAddress = null;
+                    textLblAddress.setVisibility(View.GONE);
                 } else {
                     textPickup.setVisibility(View.INVISIBLE);
                     mOrder.IdAddress = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdAddress;
                     mOrder.IdNeighborhood = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdNeighborhood;
                     imgPickupDelivery.setImageResource(R.drawable.if_truck_1054949);
+                    spinnerAddress.setVisibility(View.VISIBLE);
+                    mOrder.IdAddress = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdAddress;
+                    mOrder.IdNeighborhood = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdNeighborhood;
+                    textLblAddress.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -251,15 +247,25 @@ public class CloseOrderFragment extends Fragment {
             Toast.makeText(getContext(), "Nenhum Item adicionado", Toast.LENGTH_SHORT).show();
             error = true;
         }
-        if (mOrder.IdAddress == null) {
-            Toast.makeText(getContext(), "Deve ser selecionado um endereço", Toast.LENGTH_SHORT).show();
-            error = true;
-        }
         if (mOrder.PaymentMethod == 0) {
             if (mOrder.ChangeOfMoney <= 0) {
                 Toast.makeText(getContext(), "Qual o valor para troco?", Toast.LENGTH_SHORT).show();
                 error = true;
             }
+        }
+        if (!mOrder.Pickup && (mOrder.IdAddress == null || mOrder.IdNeighborhood == null)) {
+            error = true;
+            Toast.makeText(getContext(), "Precisa ser selecionado o endereço", Toast.LENGTH_SHORT).show();
+        }
+        if (mOrder.DeliveryDate == null) {
+            error = true;
+
+            String textPickup = "entrega";
+
+            if (mOrder.Pickup)
+                textPickup = "retirada";
+
+            Toast.makeText(getContext(), "Qual seria o dia da " + textPickup + "?", Toast.LENGTH_SHORT).show();
         }
 
         return !error;
@@ -296,14 +302,16 @@ public class CloseOrderFragment extends Fragment {
         loadingDialog.dismiss();
     }
 
-    private void finalizeOk() {
+    private void finalizeOk(String orderId) {
         MessageBus bus = new MessageBus();
         bus.className = CloseOrderFragment.class + "";
         bus.message = "pedidoFechado";
+        bus.additionalInfo = orderId;
         EventBus.getDefault().post(bus);
     }
 
     private void initViews(View v) {
+        textLblAddress = (TextView) v.findViewById(R.id.lbl_address);
         txtDateSelected = (TextView) v.findViewById(R.id.date_selected);
         radioManha = (RadioButton) v.findViewById(R.id.radio_manha);
         radioTarde = (RadioButton) v.findViewById(R.id.radio_tarde);
@@ -323,7 +331,7 @@ public class CloseOrderFragment extends Fragment {
         private Context _context;
         int orderId;
         boolean error = false;
-
+        String message;
         public Tasks(Context context) {
             _context = context;
         }
@@ -339,7 +347,9 @@ public class CloseOrderFragment extends Fragment {
             super.onPostExecute(aVoid);
             hideDialog();
             if (!error) {
-                finalizeOk();
+                finalizeOk(String.valueOf(orderId));
+            } else {
+                Toast.makeText(_context, message, Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -350,7 +360,7 @@ public class CloseOrderFragment extends Fragment {
                 orderId = orderService.createOrder();
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(_context, "Houve algum erro ao gerara seu pedido =(", Toast.LENGTH_SHORT).show();
+                message = "Houve algum erro ao gerara seu pedido =(";
                 error = true;
             }
 

@@ -82,6 +82,8 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
         private Button btnAdd;
         private EditText itemQuantity;
         private CardView cardView;
+        private Button btnPlus;
+        private Button btnMinus;
 
         public FoodViewHolder(final View itemView) {
             super(itemView);
@@ -89,18 +91,30 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
             img = (ImageView) itemView.findViewById(R.id.img);
             title = (TextView) itemView.findViewById(R.id.title);
             btnAdd = (Button) itemView.findViewById(R.id.addButton);
+            btnAdd = (Button) itemView.findViewById(R.id.btn_plus);
+            btnAdd = (Button) itemView.findViewById(R.id.btn_minus);
             itemQuantity = (EditText) itemView.findViewById(R.id.itemQuantity);
             cardView = (CardView) itemView.findViewById(R.id.itemCard);
 
             btnAdd.setOnClickListener(this);
             cardView.setOnClickListener(this);
+            btnPlus.setOnClickListener(this);
+            btnMinus.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             if (v instanceof Button) {
-                if (itemAdapterBtnClick != null) {
-                    itemAdapterBtnClick.onClickBtn(getAdapterPosition(), Integer.parseInt(itemQuantity.getText().toString()));
+                if(v.getId() == R.id.addButton) {
+                    if (itemAdapterBtnClick != null) {
+                        itemAdapterBtnClick.onClickBtn(getAdapterPosition(), Integer.parseInt(itemQuantity.getText().toString()));
+                    }
+                }
+                else if(v.getId() == R.id.btn_plus){
+                    //somar
+                }
+                else if(v.getId() == R.id.btn_minus){
+                    //diminuir
                 }
             } else if (v instanceof CardView) {
                 if (itemAdapterBtnClick != null) {

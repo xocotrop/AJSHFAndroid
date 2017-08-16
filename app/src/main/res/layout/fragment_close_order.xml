@@ -57,7 +57,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right|center_vertical"
-                    android:text="xxx" />
+                    android:text="" />
             </FrameLayout>
 
 
@@ -85,6 +85,7 @@
             </RadioGroup>
 
             <TextView
+                android:id="@+id/lbl_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Endereço:" />
