@@ -1,6 +1,7 @@
 package br.com.irweb.ajshf.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -91,8 +92,8 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
             img = (ImageView) itemView.findViewById(R.id.img);
             title = (TextView) itemView.findViewById(R.id.title);
             btnAdd = (Button) itemView.findViewById(R.id.addButton);
-            btnAdd = (Button) itemView.findViewById(R.id.btn_plus);
-            btnAdd = (Button) itemView.findViewById(R.id.btn_minus);
+            btnPlus = (Button) itemView.findViewById(R.id.btn_plus);
+            btnMinus = (Button) itemView.findViewById(R.id.btn_minus);
             itemQuantity = (EditText) itemView.findViewById(R.id.itemQuantity);
             cardView = (CardView) itemView.findViewById(R.id.itemCard);
 
@@ -111,10 +112,31 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
                     }
                 }
                 else if(v.getId() == R.id.btn_plus){
-                    //somar
+                    int qtd = 0;
+                    String qtdStr = itemQuantity.getText().toString();
+                    if(qtdStr.isEmpty()){
+                        qtdStr = "0";
+                        qtd = Integer.valueOf(qtdStr);
+                        qtd++;
+                    } else {
+                        qtd = Integer.valueOf(qtdStr);
+                        qtd++;
+                    }
+                    itemQuantity.setText(qtd+"");
                 }
                 else if(v.getId() == R.id.btn_minus){
-                    //diminuir
+                    int qtd = 0;
+                    String qtdStr = itemQuantity.getText().toString();
+                    if(qtdStr.isEmpty()){
+                        qtdStr = "0";
+                    } else {
+                        qtd = Integer.valueOf(qtdStr);
+                        qtd--;
+                        if(qtd < 0){
+                            qtd = 0;
+                        }
+                    }
+                    itemQuantity.setText(qtd+"");
                 }
             } else if (v instanceof CardView) {
                 if (itemAdapterBtnClick != null) {

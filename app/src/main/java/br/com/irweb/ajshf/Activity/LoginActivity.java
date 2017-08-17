@@ -148,7 +148,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         loginButton.setReadPermissions("public_profile,email,user_friends");
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
+            public void onSuccess(LoginResult loginResult)
+            {
 
                 Log.d("Access token", loginResult.getAccessToken().getToken());
                 Log.d("Id Facebook", loginResult.getAccessToken().getUserId());
@@ -156,12 +157,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
 
             @Override
-            public void onCancel() {
+            public void onCancel()
+            {
 
             }
 
             @Override
-            public void onError(FacebookException error) {
+            public void onError(FacebookException error)
+            {
 
             }
         });

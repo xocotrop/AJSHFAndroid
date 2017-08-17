@@ -36,7 +36,7 @@
                 android:layout_alignTop="@+id/img"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center_horizontal|top"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:text="Titulo"
                 android:textStyle="bold" />
 
@@ -46,7 +46,7 @@
                 android:layout_alignLeft="@+id/img"
                 android:layout_alignTop="@+id/title"
                 android:layout_marginLeft="100dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="25dp"
                 android:orientation="horizontal">
 
                 <Button
@@ -57,18 +57,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
-                <EditText
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:textAlignment="center"
-                    android:text="0"
-                    android:id="@+id/itemQuantity"
+                <android.support.design.widget.TextInputLayout
                     android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="Quantidade"
-                    android:inputType="number"
-                    android:textSize="12sp" />
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:textAlignment="center"
+                        android:text=""
+                        android:id="@+id/itemQuantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Qtd.:"
+                        android:inputType="number"
+                        android:textSize="11sp" />
+                </android.support.design.widget.TextInputLayout>
 
                 <Button
                     android:minWidth="0dp"

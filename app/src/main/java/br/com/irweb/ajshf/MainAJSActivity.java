@@ -2,28 +2,23 @@ package br.com.irweb.ajshf;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
+import android.view.View;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import br.com.irweb.ajshf.Activity.LoginActivity;
 import br.com.irweb.ajshf.Application.AJSHFApp;
@@ -53,9 +48,9 @@ public class MainAJSActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void onMessageEvent(MessageBus bus){
-        if(bus.className.equalsIgnoreCase(CartFragment.class+"")){
-            if(bus.message.equalsIgnoreCase("fecharPedido")){
+    public void onMessageEvent(MessageBus bus) {
+        if (bus.className.equalsIgnoreCase(CartFragment.class + "")) {
+            if (bus.message.equalsIgnoreCase("fecharPedido")) {
                 Fragment frag = CloseOrderFragment.newInstance();
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -65,9 +60,8 @@ public class MainAJSActivity extends AppCompatActivity
                 transaction.addToBackStack("closeOrder");
                 transaction.commit();
             }
-        }
-        else if(bus.className.equalsIgnoreCase(CloseOrderFragment.class+"")){
-            if(bus.message.equalsIgnoreCase("pedidoFechado")){
+        } else if (bus.className.equalsIgnoreCase(CloseOrderFragment.class + "")) {
+            if (bus.message.equalsIgnoreCase("pedidoFechado")) {
                 Fragment frag = OrderOkFragment.newInstance(bus.additionalInfo);
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -75,10 +69,11 @@ public class MainAJSActivity extends AppCompatActivity
 
                 transaction.replace(R.id.replace_fragment, frag, "finishOrder");
                 transaction.commit();
+                AJSHFApp.clearOrder();
+                updateViewCart();
             }
-        }
-        else if(bus.className.equalsIgnoreCase(OrderOkFragment.class+"")){
-            if(bus.message.equalsIgnoreCase("MenuInicial")){
+        } else if (bus.className.equalsIgnoreCase(OrderOkFragment.class + "")) {
+            if (bus.message.equalsIgnoreCase("MenuInicial")) {
 
                 Fragment frag = MenuFragment.newInstance();
 

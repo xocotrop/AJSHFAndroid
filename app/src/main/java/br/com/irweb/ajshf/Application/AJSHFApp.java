@@ -44,6 +44,7 @@ public class AJSHFApp extends Application {
     public static void clearOrder() {
         if (order != null) {
             order = null;
+            order = new Order();
         }
     }
 

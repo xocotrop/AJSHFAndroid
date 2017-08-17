@@ -160,6 +160,11 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mOrder.Observation = editTextObservation.getText().toString();
+                if(mOrder.PaymentMethod == 0){
+                    mOrder.ChangeOfMoney = Float.valueOf(editTextChangeMoney.getText().toString());
+                } else {
+                    mOrder.ChangeOfMoney = 0f;
+                }
                 if (!validateOrder()) {
                     return;
                 }
