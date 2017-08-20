@@ -1,7 +1,6 @@
 package br.com.irweb.ajshf.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -106,15 +105,20 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
         @Override
         public void onClick(View v) {
             if (v instanceof Button) {
-                if(v.getId() == R.id.addButton) {
+                if (v.getId() == R.id.addButton) {
                     if (itemAdapterBtnClick != null) {
-                        itemAdapterBtnClick.onClickBtn(getAdapterPosition(), Integer.parseInt(itemQuantity.getText().toString()));
+                        String qtd;
+                        if (itemQuantity.getText().toString().isEmpty()) {
+                            qtd = "1";
+                        } else {
+                            qtd = itemQuantity.getText().toString();
+                        }
+                        itemAdapterBtnClick.onClickBtn(getAdapterPosition(), Integer.parseInt(qtd));
                     }
-                }
-                else if(v.getId() == R.id.btn_plus){
+                } else if (v.getId() == R.id.btn_plus) {
                     int qtd = 0;
                     String qtdStr = itemQuantity.getText().toString();
-                    if(qtdStr.isEmpty()){
+                    if (qtdStr.isEmpty()) {
                         qtdStr = "0";
                         qtd = Integer.valueOf(qtdStr);
                         qtd++;
@@ -122,21 +126,20 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
                         qtd = Integer.valueOf(qtdStr);
                         qtd++;
                     }
-                    itemQuantity.setText(qtd+"");
-                }
-                else if(v.getId() == R.id.btn_minus){
+                    itemQuantity.setText(qtd + "");
+                } else if (v.getId() == R.id.btn_minus) {
                     int qtd = 0;
                     String qtdStr = itemQuantity.getText().toString();
-                    if(qtdStr.isEmpty()){
+                    if (qtdStr.isEmpty()) {
                         qtdStr = "0";
                     } else {
                         qtd = Integer.valueOf(qtdStr);
                         qtd--;
-                        if(qtd < 0){
+                        if (qtd < 0) {
                             qtd = 0;
                         }
                     }
-                    itemQuantity.setText(qtd+"");
+                    itemQuantity.setText(qtd + "");
                 }
             } else if (v instanceof CardView) {
                 if (itemAdapterBtnClick != null) {
@@ -148,6 +151,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
 
     public interface ItemAdapterBtnClick {
         void onClickBtn(int position, int quantity);
+
         void onClickCard(int position);
     }
 }

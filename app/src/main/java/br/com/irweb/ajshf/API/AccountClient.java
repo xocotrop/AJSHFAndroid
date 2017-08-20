@@ -18,6 +18,10 @@ import retrofit2.http.POST;
 public interface AccountClient {
     @FormUrlEncoded
     @POST("/token")
+    Call<ResponseBody> GenerateTokenFacebook(@Field("token") String token, @Field("grant_type") String grantType);
+
+    @FormUrlEncoded
+    @POST("/token")
     Call<ResponseBody> GenerateToken(@Field("username") String username, @Field("password") String password, @Field("grant_type") String grantType);
 
     @FormUrlEncoded

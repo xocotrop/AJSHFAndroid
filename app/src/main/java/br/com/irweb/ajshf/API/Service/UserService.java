@@ -121,6 +121,27 @@ public class UserService {
 
     }
 
+    public GenerateTokenResponse AuthFacebook(String token) throws IOException, ApiException {
+
+        Call<ResponseBody> generateToken = accountClient.GenerateTokenFacebook(token, "facebook_token");
+
+        Response<ResponseBody> response = generateToken.execute();
+
+        if (response.code() == HttpURLConnection.HTTP_OK) {
+
+            Type t = new TypeToken<GenerateTokenResponse>() {
+            }.getType();
+
+            return new Gson().fromJson(response.body().string(), t);
+
+        }
+        ApiException exception = new ApiException();
+        exception.setMessage(response.errorBody().string());
+        exception.setStatusCode(response.code());
+        throw exception;
+
+    }
+
     public GenerateTokenResponse Auth(String login, String pass) throws IOException, ApiException {
 
         Call<ResponseBody> generateToken = accountClient.GenerateToken(login, pass, "password");
@@ -144,7 +165,7 @@ public class UserService {
 
     public GenerateTokenResponse RefreshToken() throws IOException, ApiException {
 
-        Call<ResponseBody> refreshToken = accountClient.RefreshToken("refresh_tokenhsdgfhjgsdfjgf", "refresh_token");
+        Call<ResponseBody> refreshToken = accountClient.RefreshToken(AJSHFApp.getInstance().getUser().refreshToken, "refresh_token");
 
         Response<ResponseBody> response = refreshToken.execute();
 

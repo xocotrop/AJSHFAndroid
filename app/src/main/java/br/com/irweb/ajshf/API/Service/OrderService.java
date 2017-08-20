@@ -10,9 +10,10 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.util.List;
 
+import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.API.OrderClient;
 import br.com.irweb.ajshf.Application.AJSHFApp;
-import br.com.irweb.ajshf.Entities.Client;
+import br.com.irweb.ajshf.Business.UserBusiness;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import okhttp3.ResponseBody;
@@ -31,6 +32,7 @@ public class OrderService {
     private String userToken;
     private UserAuthAJSHF user;
     private Order order;
+    private UserBusiness userBusiness;
 
     public OrderService(Context context) {
         this.context = context;
@@ -39,6 +41,7 @@ public class OrderService {
 
         user = AJSHFApp.getInstance().getUser();
         order = AJSHFApp.getOrder();
+        userBusiness = new UserBusiness(context);
     }
 
     public int createOrder() throws Exception {
@@ -72,23 +75,33 @@ public class OrderService {
 
     public List<Order> getOrders() throws IOException {
 
-        Call<ResponseBody> client = orderClient.getOrders(getUserToken());
+        Response<ResponseBody> response;
 
         try {
-            Response<ResponseBody> response = client.execute();
+            while (true) {
+                Call<ResponseBody> client = orderClient.getOrders(getUserToken());
 
-            if (response.code() == HttpURLConnection.HTTP_OK) {
-                Type t = new TypeToken<List<Order>>() {
-                }.getType();
-                return new Gson().fromJson(response.body().string(), t);
+                response = client.execute();
+
+                if (response.code() == HttpURLConnection.HTTP_OK) {
+                    Type t = new TypeToken<List<Order>>() {
+                    }.getType();
+                    return new Gson().fromJson(response.body().string(), t);
+                } else if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    if (userBusiness.RefreshToken()) {
+                        continue;
+                    }
+                    break;
+                }
+
             }
-
-            return null;
-
         } catch (IOException e) {
             e.printStackTrace();
             throw e;
+        } catch (ApiException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     public List<Order> getOrders(int idOrder) throws IOException {

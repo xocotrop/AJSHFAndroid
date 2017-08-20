@@ -148,23 +148,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         loginButton.setReadPermissions("public_profile,email,user_friends");
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult)
-            {
+            public void onSuccess(LoginResult loginResult) {
 
                 Log.d("Access token", loginResult.getAccessToken().getToken());
                 Log.d("Id Facebook", loginResult.getAccessToken().getUserId());
                 LoginManager.getInstance().logOut();
+                showProgress(true);
+                new UserLoginTask(loginResult.getAccessToken().getToken()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
 
             @Override
-            public void onCancel()
-            {
+            public void onCancel() {
 
             }
 
             @Override
-            public void onError(FacebookException error)
-            {
+            public void onError(FacebookException error) {
 
             }
         });
@@ -360,20 +359,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
-        private final String mPassword;
+        private String mEmail;
+        private String mPassword;
         private String message;
+        private String tokenFacebook;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
         }
 
+        UserLoginTask(String token) {
+            tokenFacebook = token;
+        }
+
         @Override
         protected Boolean doInBackground(Void... params) {
 
             try {
-                business.Authentication(mEmail, mPassword);
+                if (tokenFacebook.isEmpty())
+                    business.Authentication(mEmail, mPassword);
+                else
+                    business.AuthenticationFB(tokenFacebook);
                 return true;
             } catch (ApiException e) {
                 message = e.getMessage();

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.SyncStateContract;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -43,6 +44,7 @@ public class MenuFragment extends Fragment {
     private FoodService service;
     private List<Food> mFoods;
     private CartService cartService;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     private OnFragmentInteractionListener mListener;
@@ -69,6 +71,10 @@ public class MenuFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        startTaskLoadMenu();
+    }
+
+    private void startTaskLoadMenu() {
         new MenuTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -83,6 +89,17 @@ public class MenuFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_menu, container, false);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(android.R.color.holo_red_dark), getResources().getColor(android.R.color.holo_green_dark), getResources().getColor(android.R.color.holo_blue_dark), getResources().getColor(android.R.color.holo_orange_light));
+        swipeRefreshLayout.setEnabled(false);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startTaskLoadMenu();
+            }
+        });
 
         recyclerViewMenu = (RecyclerView) v.findViewById(R.id.menu_items);
 
@@ -218,6 +235,11 @@ public class MenuFragment extends Fragment {
             } else if (messageError == null || messageError.isEmpty()) {
                 Toast.makeText(getContext(), messageError, Toast.LENGTH_SHORT).show();
             }
+
+            if(swipeRefreshLayout.isRefreshing())
+                swipeRefreshLayout.setRefreshing(false);
+
+            swipeRefreshLayout.setEnabled(true);
         }
 
         @Override
@@ -230,6 +252,9 @@ public class MenuFragment extends Fragment {
             List<Food> foods = null;
             try {
                 foods = service.GetFood();
+                if(foods == null){
+                    Toast.makeText(getContext(), "Nenhum cardápio encontrado", Toast.LENGTH_SHORT).show();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
 

@@ -24,7 +24,7 @@ public interface OrderClient {
     @GET("/api/Order")
     Call<ResponseBody> getOrders(@Header("Authorization") String authorization);
 
-    @Headers("Content-type: application/json")
+    @Headers({"Content-type: application/json", "device: 1"})
     @POST("/api/Order")
     Call<ResponseBody> postOrder(@Body Order order, @Header("Authorization") String authorization);
 }

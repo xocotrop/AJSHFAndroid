@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.Streams;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -17,6 +16,7 @@ import java.util.List;
 import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.API.FoodClient;
 import br.com.irweb.ajshf.Application.AJSHFApp;
+import br.com.irweb.ajshf.Business.UserBusiness;
 import br.com.irweb.ajshf.Entities.Food;
 import br.com.irweb.ajshf.Entities.ItemOrder;
 import br.com.irweb.ajshf.Entities.Order;
@@ -37,16 +37,18 @@ public class FoodService {
     private Context context;
     private UserAuthAJSHF user;
     private String userToken;
+    private UserBusiness userBusiness;
 
     public FoodService(Context context) {
         this.context = context;
         retrofit = AJSHFApp.getInstance().getRetrofit();
         foodClient = retrofit.create(FoodClient.class);
         user = AJSHFApp.getInstance().getUser();
+        userBusiness = new UserBusiness(context);
     }
 
-    private String getUserToken(){
-        if(userToken != null){
+    private String getUserToken() {
+        if (userToken != null) {
             return userToken;
         }
         userToken = String.format("%s %s", user.tokenType, user.accessToken);
@@ -54,12 +56,12 @@ public class FoodService {
     }
 
     public void addItemOrder(Food food) throws Exception {
-        if(food == null){
+        if (food == null) {
             throw new Exception("Food is null");
         }
 
         Order order = AJSHFApp.getOrder();
-        if(order.Items == null){
+        if (order.Items == null) {
             order.Items = new ArrayList<ItemOrder>();
         }
 
@@ -68,12 +70,12 @@ public class FoodService {
         order.Items.add(item);
     }
 
-    public void removeItemOrder(int id){
+    public void removeItemOrder(int id) {
         Order order = AJSHFApp.getOrder();
-        if(order.Items != null){
+        if (order.Items != null) {
             for (ItemOrder item :
                     order.Items) {
-                if(item.MenuId == id){
+                if (item.MenuId == id) {
                     order.Items.remove(item);
                     break;
                 }
@@ -89,31 +91,38 @@ public class FoodService {
         item.Name = food.Title;
         item.Quantity = 1;
         item.Value = food.Value;
-        if (food.Custom){
+        if (food.Custom) {
             //custom items
         }
         return item;
     }
 
     public Food GetFood(int foodId) throws IOException, ApiException {
+        Response<ResponseBody> response;
+        while (true) {
+            Call<ResponseBody> foodClient = this.foodClient.GetFood(foodId, getUserToken());
 
-        Call<ResponseBody> foodClient = this.foodClient.GetFood(foodId, getUserToken());
+            response = foodClient.execute();
 
-        Response<ResponseBody> response = foodClient.execute();
+            if (response.code() == HttpURLConnection.HTTP_OK) {
+                String content = response.body().string();
 
-        if (response.code() == HttpURLConnection.HTTP_OK) {
-            String content = response.body().string();
+                Type t = new TypeToken<Food>() {
+                }.getType();
 
-            Type t = new TypeToken<Food>() {
-            }.getType();
+                Gson gson = new GsonBuilder()
+                        .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                        .create();
 
-            Gson gson = new GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                    .create();
-
-            return gson.fromJson(content, t);
+                return gson.fromJson(content, t);
+            } else if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                if (userBusiness.RefreshToken()) {
+                    continue;
+                }
+                break;
+            }
+            break;
         }
-
         ApiException ex = new ApiException();
         ex.setStatusCode(response.code());
         ex.setMessage(response.errorBody().string());
@@ -123,24 +132,34 @@ public class FoodService {
     }
 
     public List<Food> GetFood() throws IOException, ApiException {
-        Call<ResponseBody> foodClient = this.foodClient.GetFood(getUserToken());
 
-        Response<ResponseBody> response = foodClient.execute();
+        Response<ResponseBody> response;
 
-        if (response.code() == HttpURLConnection.HTTP_OK) {
-            String content = response.body().string();
+        while (true) {
+            Call<ResponseBody> foodClient = this.foodClient.GetFood(getUserToken());
 
-            Type t = new TypeToken<List<Food>>() {
-            }.getType();
+            response = foodClient.execute();
 
-            Gson gson = new GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                    .create();
+            if (response.code() == HttpURLConnection.HTTP_OK) {
+                String content = response.body().string();
 
-            return gson.fromJson(content, t);
-        }
-        else if(response.code() == HttpURLConnection.HTTP_NOT_FOUND){
-            return null;
+                Type t = new TypeToken<List<Food>>() {
+                }.getType();
+
+                Gson gson = new GsonBuilder()
+                        .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                        .create();
+
+                return gson.fromJson(content, t);
+            } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
+                return null;
+            } else if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                if (userBusiness.RefreshToken()) {
+                    continue;
+                }
+                break;
+            }
+            break;
         }
 
         ApiException ex = new ApiException();

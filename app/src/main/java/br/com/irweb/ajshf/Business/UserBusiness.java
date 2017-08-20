@@ -79,6 +79,72 @@ public class UserBusiness {
         return false;
     }
 
+    public boolean AuthenticationFB(String token) throws ApiException {
+
+        try {
+            GenerateTokenResponse userAuth = service.AuthFacebook(token);
+
+
+            UserAuthAJSHF authAJSHF = createUserAuth(userAuth);
+
+            String serialize = new Gson().toJson(authAJSHF);
+
+            AJSHFApp.getInstance().setUserToken(authAJSHF);
+            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERTOKEN, serialize);
+
+            List<Address> addresses = service.getAddress();
+
+            AddressUserAJSHF addressUserAJSHF = createAddress(addresses);
+
+            String addressSerialize = new Gson().toJson(addressUserAJSHF);
+
+            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERADDRESSTOKEN, addressSerialize);
+            AJSHFApp.getInstance().setADdressUserToken(addressUserAJSHF);
+
+            return true;
+        } catch (ApiException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean RefreshToken() throws ApiException {
+
+        try {
+            GenerateTokenResponse userAuth = service.RefreshToken();
+
+
+            UserAuthAJSHF authAJSHF = createUserAuth(userAuth);
+
+            String serialize = new Gson().toJson(authAJSHF);
+
+            AJSHFApp.getInstance().setUserToken(authAJSHF);
+            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERTOKEN, serialize);
+
+            List<Address> addresses = service.getAddress();
+
+            AddressUserAJSHF addressUserAJSHF = createAddress(addresses);
+
+            String addressSerialize = new Gson().toJson(addressUserAJSHF);
+
+            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERADDRESSTOKEN, addressSerialize);
+            AJSHFApp.getInstance().setADdressUserToken(addressUserAJSHF);
+
+            return true;
+        } catch (ApiException e) {
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     @NonNull
     private AddressUserAJSHF createAddress(List<Address> addresses) {
         AddressUserAJSHF addressUserAJSHF = new AddressUserAJSHF();
