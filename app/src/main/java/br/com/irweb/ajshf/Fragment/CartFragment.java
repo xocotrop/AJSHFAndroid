@@ -2,6 +2,7 @@ package br.com.irweb.ajshf.Fragment;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import org.greenrobot.eventbus.EventBus;
 import br.com.irweb.ajshf.Adapter.ItemCartAdapter;
 import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.R;
+import br.com.irweb.ajshf.Service.CartService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +26,7 @@ public class CartFragment extends Fragment {
     private Button btnCloseOrder;
     private RecyclerView itemsCart;
     private ItemCartAdapter itemCartAdapter;
+    private CartService cartService;
 
     public CartFragment() {
         // Required empty public constructor
@@ -47,6 +50,11 @@ public class CartFragment extends Fragment {
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        cartService = new CartService(getContext());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,6 +68,18 @@ public class CartFragment extends Fragment {
         itemCartAdapter = new ItemCartAdapter(getContext());
         itemsCart.setAdapter(itemCartAdapter);
         itemsCart.setLayoutManager(new LinearLayoutManager(getContext()));
+        itemCartAdapter.setItemAdapterBtnClick(new ItemCartAdapter.ItemAdapterBtnClick() {
+            @Override
+            public void onClickRemove(int position) {
+                //cartService.removeItemOrder();
+                //continuar
+            }
+
+            @Override
+            public void onClickCard(int position) {
+
+            }
+        });
 
         btnCloseOrder.setOnClickListener(new View.OnClickListener() {
             @Override

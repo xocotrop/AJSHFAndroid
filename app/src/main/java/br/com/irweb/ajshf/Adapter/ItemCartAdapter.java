@@ -22,11 +22,16 @@ public class ItemCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Context _context;
     private Order _order;
     private LayoutInflater _inflater;
+    private ItemAdapterBtnClick itemAdapterBtnClick;
 
     public ItemCartAdapter(Context context) {
         _context = context;
         _order = AJSHFApp.getOrder();
         _inflater = LayoutInflater.from(context);
+    }
+
+    public void setItemAdapterBtnClick(ItemAdapterBtnClick itemAdapterBtnClick){
+        this.itemAdapterBtnClick = itemAdapterBtnClick;
     }
 
     @Override
@@ -78,6 +83,15 @@ public class ItemCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void onClick(View v) {
             _order.Items.remove(getAdapterPosition());
             notifyDataSetChanged();
+            if(itemAdapterBtnClick != null){
+                itemAdapterBtnClick.onClickRemove(getAdapterPosition());
+            }
         }
+    }
+
+    public interface ItemAdapterBtnClick {
+        void onClickRemove(int position);
+
+        void onClickCard(int position);
     }
 }

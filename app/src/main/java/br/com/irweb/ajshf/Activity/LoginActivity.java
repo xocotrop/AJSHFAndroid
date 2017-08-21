@@ -159,12 +159,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             @Override
             public void onCancel() {
-
+                Toast.makeText(getBaseContext(), "Processo de login cancelado", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(FacebookException error) {
-
+                Toast.makeText(getBaseContext(), "Erro ao logar: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -362,7 +362,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private String mEmail;
         private String mPassword;
         private String message;
-        private String tokenFacebook;
+        private String tokenFacebook = "";
 
         UserLoginTask(String email, String password) {
             mEmail = email;

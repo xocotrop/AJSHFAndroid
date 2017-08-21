@@ -259,6 +259,10 @@ public class CloseOrderFragment extends Fragment {
                 Toast.makeText(getContext(), "Qual o valor para troco?", Toast.LENGTH_SHORT).show();
                 error = true;
             }
+            else if(mOrder.ChangeOfMoney < mOrder.TotalValue){
+                Toast.makeText(getContext(), "Valor para troco menor que o Total.", Toast.LENGTH_SHORT).show();
+                error = true;
+            }
         }
         if (!mOrder.Pickup && (mOrder.IdAddress == null || mOrder.IdNeighborhood == null)) {
             error = true;

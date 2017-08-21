@@ -2,6 +2,7 @@ package br.com.irweb.ajshf;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,6 +35,7 @@ public class MainAJSActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private TextView cartTotalView;
+    private FloatingActionButton fab;
 
     @Override
     protected void onStart() {
@@ -89,14 +91,22 @@ public class MainAJSActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_ajs);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         if (!VerifyIsLogged()) {
             return;
         }
 
+        setContentView(R.layout.activity_main_ajs);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -123,6 +133,12 @@ public class MainAJSActivity extends AppCompatActivity
         Order order = AJSHFApp.getOrder();
         if (order != null)
             cartTotalView.setText(String.format("R$ %s", order.TotalValue));
+
+        if(order != null && order.Items != null && order.Items.size() > 0){
+            fab.show();
+        } else {
+            fab.hide();
+        }
     }
 
     private boolean VerifyIsLogged() {
