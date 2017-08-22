@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.SyncStateContract;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -34,6 +35,7 @@ import br.com.irweb.ajshf.API.Service.FoodService;
 import br.com.irweb.ajshf.Adapter.MenuItemViewHolderAdapter;
 import br.com.irweb.ajshf.Entities.Food;
 import br.com.irweb.ajshf.Helpers.StringHelper;
+import br.com.irweb.ajshf.MainAJSActivity;
 import br.com.irweb.ajshf.R;
 import br.com.irweb.ajshf.Service.CartService;
 
@@ -66,6 +68,7 @@ public class MenuFragment extends Fragment {
         if (getArguments() != null) {
 
         }
+
     }
 
     @Override
@@ -110,7 +113,7 @@ public class MenuFragment extends Fragment {
                 Food f = mFoods.get(position);
                 try {
                     cartService.addItemOrder(f, quantity);
-                    Toast.makeText(getContext(), String.format("%s adicionado com sucesso ao carrinho", f.Title), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), String.format("%s adicionado com sucesso ao carrinho", f.Title), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     if (e.getMessage() == "Food is null") {
                         Toast.makeText(getContext(), "Houve um erro ao adicionar o Item no carrinho", Toast.LENGTH_SHORT).show();
@@ -196,6 +199,12 @@ public class MenuFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ((MainAJSActivity)getContext()).showFAB();
     }
 
     @Override

@@ -162,6 +162,7 @@ public class UserBusiness {
         authAJSHF.LastName = userAuth.LastName;
         authAJSHF.Name = userAuth.Name;
         authAJSHF.ReceiveUpdates = userAuth.ReceiveUpdates;
+        authAJSHF.refreshToken = userAuth.refreshToken;
         return authAJSHF;
     }
 

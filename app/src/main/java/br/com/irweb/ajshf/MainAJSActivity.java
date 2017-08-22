@@ -104,7 +104,7 @@ public class MainAJSActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                LoadCartFragment();
             }
         });
 
@@ -128,10 +128,16 @@ public class MainAJSActivity extends AppCompatActivity
 
     }
 
+    public void hideFAB(){
+        fab.hide();
+    }
+    public void showFAB(){
+        updateViewCart();
+    }
 
     public void updateViewCart() {
         Order order = AJSHFApp.getOrder();
-        if (order != null)
+        if (order != null && cartTotalView != null)
             cartTotalView.setText(String.format("R$ %s", order.TotalValue));
 
         if(order != null && order.Items != null && order.Items.size() > 0){
@@ -201,19 +207,23 @@ public class MainAJSActivity extends AppCompatActivity
             return true;
         } else if (id == R.id.action_cart) {
             // Handle the camera action
-            Fragment fragment = CartFragment.newIstance();
-
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-            transaction.replace(R.id.replace_fragment, fragment, "cart");
-            transaction.addToBackStack("cart");
-            transaction.commit();
+            LoadCartFragment();
             return true;
 
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void LoadCartFragment() {
+        Fragment fragment = CartFragment.newIstance();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        transaction.replace(R.id.replace_fragment, fragment, "cart");
+        transaction.addToBackStack("cart");
+        transaction.commit();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

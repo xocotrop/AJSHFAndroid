@@ -82,12 +82,12 @@ public class CartService {
                     order.Items) {
                 if (item.MenuId == id) {
                     order.Items.remove(item);
-                    notifyCartChanged();
                     break;
                 }
             }
         }
         calcTotal();
+        notifyCartChanged();
     }
 
     @NonNull
