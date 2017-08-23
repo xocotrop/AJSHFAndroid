@@ -58,6 +58,9 @@ public class CartService {
         }
         calcTotal();
         notifyCartChanged();
+        if (context instanceof MainAJSActivity) {
+            ((MainAJSActivity) context).showFAB();
+        }
     }
 
     private ItemOrder getItemOrder(int idFood) {

@@ -2,6 +2,9 @@ package br.com.irweb.ajshf.Fragment;
 
 
 import android.content.Context;
+import android.icu.text.NumberFormat;
+import android.icu.util.Currency;
+import android.icu.util.CurrencyAmount;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,8 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.Locale;
 
 import br.com.irweb.ajshf.Adapter.ItemCartAdapter;
 import br.com.irweb.ajshf.Application.AJSHFApp;
@@ -34,6 +40,7 @@ public class CartFragment extends Fragment {
     private ItemCartAdapter itemCartAdapter;
     private CartService cartService;
     private Order _order;
+    private TextView txtOrderTotal;
 
     public CartFragment() {
         // Required empty public constructor
@@ -80,6 +87,7 @@ public class CartFragment extends Fragment {
         btnCloseOrder = (Button) v.findViewById(R.id.btn_close_order);
         itemsCart = (RecyclerView) v.findViewById(R.id.list_items);
         btnBack = (Button) v.findViewById(R.id.btn_back);
+        txtOrderTotal = (TextView) v.findViewById(R.id.order_total);
 
         itemCartAdapter = new ItemCartAdapter(getContext());
         itemsCart.setAdapter(itemCartAdapter);
@@ -90,6 +98,7 @@ public class CartFragment extends Fragment {
                 ItemOrder itemOrder = _order.Items.get(position);
                 cartService.removeItemOrder(itemOrder.MenuId);
                 itemCartAdapter.notifyDataSetChanged();
+                SetTotal();
             }
 
             @Override
@@ -116,7 +125,13 @@ public class CartFragment extends Fragment {
             }
         });
 
+        SetTotal();
+
         return v;
+    }
+
+    private void SetTotal() {
+        txtOrderTotal.setText(String.format("R$ %.2f", _order.TotalValue));
     }
 
     @Override

@@ -133,6 +133,10 @@ public class MainAJSActivity extends AppCompatActivity
     }
     public void showFAB(){
         updateViewCart();
+
+        if(AJSHFApp.getOrder().Items != null && AJSHFApp.getOrder().Items.size() > 0)
+            fab.show();
+
     }
 
     public void updateViewCart() {
@@ -140,11 +144,6 @@ public class MainAJSActivity extends AppCompatActivity
         if (order != null && cartTotalView != null)
             cartTotalView.setText(String.format("R$ %s", order.TotalValue));
 
-        if(order != null && order.Items != null && order.Items.size() > 0){
-            fab.show();
-        } else {
-            fab.hide();
-        }
     }
 
     private boolean VerifyIsLogged() {

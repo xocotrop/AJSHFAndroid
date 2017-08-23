@@ -30,6 +30,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/order_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="R$ 100,00" />
