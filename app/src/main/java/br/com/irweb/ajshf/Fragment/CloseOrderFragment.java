@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codetroopers.betterpickers.Utils;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
 
@@ -119,16 +121,38 @@ public class CloseOrderFragment extends Fragment {
 
     private void setupButtonFinish() {
 
+        final Calendar now = Calendar.getInstance();
+        now.add(Calendar.DAY_OF_MONTH, 1);
+        Calendar endCalendar = Calendar.getInstance();
+
+        final Calendar preSelected = Calendar.getInstance();
+        preSelected.add(Calendar.DAY_OF_MONTH, 1);
+
+
+        final MonthAdapter.CalendarDay minDate = new MonthAdapter.CalendarDay(now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH));
+
+        final MonthAdapter.CalendarDay maxDate = new MonthAdapter.CalendarDay(now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH) + 21);
+
+        endCalendar.setTimeInMillis(maxDate.getDateInMillis());
+
+        final SparseArray<MonthAdapter.CalendarDay> disabledDays = new SparseArray<>();
+
+        while(now.before(endCalendar)){
+            if(now.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+                int key = Utils.formatDisabledDayForKey(now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+                disabledDays.put(key, new MonthAdapter.CalendarDay(now));
+            }
+            now.add(Calendar.DATE, 1);
+        }
+
         btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Calendar now = Calendar.getInstance();
-                now.add(Calendar.DAY_OF_MONTH, 1);
-
-                MonthAdapter.CalendarDay minDate = new MonthAdapter.CalendarDay(now.get(Calendar.YEAR),
-                        now.get(Calendar.MONTH),
-                        now.get(Calendar.DAY_OF_MONTH));
 
                 CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
                         .setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
@@ -144,11 +168,12 @@ public class CloseOrderFragment extends Fragment {
                             }
                         })
                         .setFirstDayOfWeek(Calendar.SUNDAY)
-                        .setPreselectedDate(now.get(Calendar.YEAR),
-                                now.get(Calendar.MONTH),
-                                now.get(Calendar.DAY_OF_MONTH))
-                        .setDateRange(minDate, null)
+                        .setPreselectedDate(preSelected.get(Calendar.YEAR),
+                                preSelected.get(Calendar.MONTH),
+                                preSelected.get(Calendar.DAY_OF_MONTH))
+                        .setDateRange(minDate, maxDate)
                         .setDoneText("Aplicar")
+                        .setDisabledDays(disabledDays)
                         .setCancelText("Cancelar");
 
                 cdp.show(getChildFragmentManager(), "picker");

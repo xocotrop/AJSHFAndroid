@@ -28,6 +28,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.irweb.ajshf.API.Exception.ApiException;
@@ -260,9 +261,16 @@ public class MenuFragment extends Fragment {
         protected List<Food> doInBackground(Object... params) {
             List<Food> foods = null;
             try {
-                foods = service.GetFood();
-                if(foods == null){
+                List<Food> _foods = service.GetFood();
+                if(_foods == null){
                     Toast.makeText(getContext(), "Nenhum cardápio encontrado", Toast.LENGTH_SHORT).show();
+                } else {
+                    foods = new ArrayList<>();
+                    for (Food food :
+                            _foods) {
+                        if(!food.Custom) //remover quando estiver implementado cardapio personalizado
+                            foods.add(food);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
