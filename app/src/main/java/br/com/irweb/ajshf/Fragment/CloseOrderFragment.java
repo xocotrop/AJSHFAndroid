@@ -31,15 +31,19 @@ import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import br.com.irweb.ajshf.API.Exception.ApiException;
+import br.com.irweb.ajshf.API.Service.FreightService;
 import br.com.irweb.ajshf.API.Service.OrderService;
 import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.Entities.AddressUserAJSHF;
+import br.com.irweb.ajshf.Entities.Freight;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.PaymentMethod;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
@@ -52,8 +56,10 @@ public class CloseOrderFragment extends Fragment {
 
     private RadioButton radioManha;
     private RadioButton radioTarde;
+    private RadioButton radioNoite;
     private RadioGroup radioGroup;
     private Spinner spinnerAddress;
+    private TextView textPeriodo;
     private Spinner spinnerMethodPayment;
     private EditText editTextChangeMoney;
     private EditText editTextObservation;
@@ -65,13 +71,16 @@ public class CloseOrderFragment extends Fragment {
     private TextView txtDateSelected;
     private Calendar mCalendar;
     private TextView textLblAddress;
+    private List<Freight> freights;
 
     private Order mOrder;
     private UserAuthAJSHF user;
     private AddressUserAJSHF addressUserAJSHF;
 
     private OrderService orderService;
+    private FreightService freightService;
     private AlertDialog loadingDialog;
+    private AlertDialog loadingDialogFreight;
 
 
     public CloseOrderFragment() {
@@ -109,6 +118,7 @@ public class CloseOrderFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         createAlertDialog();
+        createAlertDialogFreight();
     }
 
     private void createAlertDialog() {
@@ -117,6 +127,14 @@ public class CloseOrderFragment extends Fragment {
         builder.setMessage("Estamos preparando a sua encomenda =). Aguarde mais um instante.");
 
         loadingDialog = builder.create();
+    }
+
+    private void createAlertDialogFreight() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Aguarde");
+        builder.setMessage("Efetuando o calculo do frete");
+
+        loadingDialogFreight = builder.create();
     }
 
     private void setupButtonFinish() {
@@ -141,8 +159,8 @@ public class CloseOrderFragment extends Fragment {
 
         final SparseArray<MonthAdapter.CalendarDay> disabledDays = new SparseArray<>();
 
-        while(now.before(endCalendar)){
-            if(now.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+        while (now.before(endCalendar)) {
+            if (now.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || now.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
                 int key = Utils.formatDisabledDayForKey(now.get(Calendar.YEAR),
                         now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
                 disabledDays.put(key, new MonthAdapter.CalendarDay(now));
@@ -185,8 +203,8 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mOrder.Observation = editTextObservation.getText().toString();
-                if(mOrder.PaymentMethod == 0){
-                    if(!editTextChangeMoney.getText().toString().isEmpty()) {
+                if (mOrder.PaymentMethod == 0) {
+                    if (!editTextChangeMoney.getText().toString().isEmpty()) {
                         mOrder.ChangeOfMoney = Float.valueOf(editTextChangeMoney.getText().toString());
                     }
                 } else {
@@ -203,6 +221,7 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mOrder.Period = 1;
+                textPeriodo.setText("Entre 12h - 17h30");
             }
         });
 
@@ -210,6 +229,15 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mOrder.Period = 0;
+                textPeriodo.setText("Entre 8h - 12h");
+            }
+        });
+
+        radioNoite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mOrder.Period = 2;
+                textPeriodo.setText("Entre 17h30 - 21h");
             }
         });
 
@@ -262,6 +290,11 @@ public class CloseOrderFragment extends Fragment {
                 mOrder.IdAddress = addressUserAJSHF.addresses.get(position).IdAddress;
                 mOrder.IdNeighborhood = addressUserAJSHF.addresses.get(position).IdNeighborhood;
 //                mOrder.IdCity = addressUserAJSHF.addresses.get(position).
+
+                //Fazer aqui a parte de ver o frete se precisa disparar a thread, se já está carregado em memoria este frete
+
+                new TaskFreigh().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
             }
 
             @Override
@@ -283,8 +316,7 @@ public class CloseOrderFragment extends Fragment {
             if (mOrder.ChangeOfMoney <= 0) {
                 Toast.makeText(getContext(), "Qual o valor para troco?", Toast.LENGTH_SHORT).show();
                 error = true;
-            }
-            else if(mOrder.ChangeOfMoney < mOrder.TotalValue){
+            } else if (mOrder.ChangeOfMoney < mOrder.TotalValue) {
                 Toast.makeText(getContext(), "Valor para troco menor que o Total.", Toast.LENGTH_SHORT).show();
                 error = true;
             }
@@ -332,6 +364,7 @@ public class CloseOrderFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         orderService = new OrderService(getContext());
+        freightService = new FreightService(getContext());
     }
 
     private void hideDialog() {
@@ -351,6 +384,7 @@ public class CloseOrderFragment extends Fragment {
         txtDateSelected = (TextView) v.findViewById(R.id.date_selected);
         radioManha = (RadioButton) v.findViewById(R.id.radio_manha);
         radioTarde = (RadioButton) v.findViewById(R.id.radio_tarde);
+        radioNoite = (RadioButton) v.findViewById(R.id.radio_noite);
         spinnerAddress = (Spinner) v.findViewById(R.id.select_address);
         spinnerMethodPayment = (Spinner) v.findViewById(R.id.select_method_payment);
         editTextChangeMoney = (EditText) v.findViewById(R.id.change_money);
@@ -358,9 +392,72 @@ public class CloseOrderFragment extends Fragment {
         checkBoxPickup = (CheckBox) v.findViewById(R.id.pickup);
         btnFinishOrder = (Button) v.findViewById(R.id.btn_finish_order);
         textPickup = (TextView) v.findViewById(R.id.text_pickup);
+        textPeriodo = (TextView) v.findViewById(R.id.lbl_periodo_entrega);
         radioGroup = (RadioGroup) v.findViewById(R.id.group);
         imgPickupDelivery = (ImageView) v.findViewById(R.id.image_pickup_delivery);
         btnDate = (Button) v.findViewById(R.id.btn_date);
+    }
+
+    private class TaskFreigh extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loadingDialogFreight.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            loadingDialogFreight.hide();
+            updateFreight();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            if (mOrder.IdAddress != null) {
+                try {
+                    List<Freight> _freights = freightService.getFreights(mOrder.IdAddress);
+                    if (_freights != null) {
+                        if (_freights == null) {
+                            freights = _freights;
+                        } else {
+                            boolean found = false;
+                            for (int o = 0; o < freights.size(); o++) {
+                                for (int i = 0; i < _freights.size(); i++) {
+                                    if (freights.get(o).IdAddress == _freights.get(i).IdAddress) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (found) {
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                freights.addAll(_freights);
+                            }
+
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ApiException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            return null;
+        }
+    }
+
+    private void updateFreight() {
+        if (radioManha.isChecked()) {
+
+        } else {
+
+        }
     }
 
     private class Tasks extends AsyncTask<Void, Void, Void> {
@@ -368,6 +465,7 @@ public class CloseOrderFragment extends Fragment {
         int orderId;
         boolean error = false;
         String message;
+
         public Tasks(Context context) {
             _context = context;
         }

@@ -82,7 +82,22 @@
                     android:layout_height="wrap_content"
                     android:checked="false"
                     android:text="Tarde" />
+
+                <RadioButton
+                    android:id="@+id/radio_noite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:text="Noite" />
             </RadioGroup>
+
+            <TextView
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:id="@+id/lbl_periodo_entrega"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Entre 8h - 12h" />
 
             <TextView
                 android:id="@+id/lbl_address"
