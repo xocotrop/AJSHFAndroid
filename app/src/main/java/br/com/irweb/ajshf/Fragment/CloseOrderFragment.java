@@ -4,6 +4,7 @@ package br.com.irweb.ajshf.Fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -82,6 +83,11 @@ public class CloseOrderFragment extends Fragment {
     private AlertDialog loadingDialog;
     private AlertDialog loadingDialogFreight;
 
+    private static boolean ThreadFreightRunning = false;
+    private int AddressSelected = 0;
+
+    private Handler handler;
+
 
     public CloseOrderFragment() {
         // Required empty public constructor
@@ -119,6 +125,20 @@ public class CloseOrderFragment extends Fragment {
 
         createAlertDialog();
         createAlertDialogFreight();
+
+        handler = new Handler();
+
+    }
+
+    private void runFreight() {
+        if (AddressSelected == 0) {
+            int position = spinnerAddress.getSelectedItemPosition();
+            int idAddress = addressUserAJSHF.addresses.get(position).IdAddress;
+            mOrder.IdAddress = idAddress;
+        }
+        //ta dando pau isso
+        //loadingDialogFreight.show();
+        new TaskFreigh().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void createAlertDialog() {
@@ -292,9 +312,12 @@ public class CloseOrderFragment extends Fragment {
 //                mOrder.IdCity = addressUserAJSHF.addresses.get(position).
 
                 //Fazer aqui a parte de ver o frete se precisa disparar a thread, se já está carregado em memoria este frete
-
-                new TaskFreigh().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
+                if (AddressSelected == 0) {
+                    AddressSelected = mOrder.IdAddress;
+                } else if (!ThreadFreightRunning && AddressSelected != mOrder.IdAddress) {
+                    runFreight();
+                    //new TaskFreigh().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
             }
 
             @Override
@@ -365,6 +388,14 @@ public class CloseOrderFragment extends Fragment {
 
         orderService = new OrderService(getContext());
         freightService = new FreightService(getContext());
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                runFreight();
+            }
+        }, 500);
+
     }
 
     private void hideDialog() {
@@ -403,7 +434,7 @@ public class CloseOrderFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            loadingDialogFreight.show();
+            ThreadFreightRunning = true;
         }
 
         @Override
@@ -411,6 +442,7 @@ public class CloseOrderFragment extends Fragment {
             super.onPostExecute(aVoid);
             loadingDialogFreight.hide();
             updateFreight();
+            ThreadFreightRunning = false;
         }
 
         @Override

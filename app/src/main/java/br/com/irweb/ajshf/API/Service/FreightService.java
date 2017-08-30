@@ -59,26 +59,38 @@ public class FreightService {
 
     public List<Freight> getFreights(int idAddress) throws IOException, ApiException {
         Response<ResponseBody> response;
-        while (true) {
-            Call<ResponseBody> freight = freightClient.getFreight(idAddress, getUserToken());
 
-            response = freight.execute();
+        Call<ResponseBody> freight = freightClient.getFreight(idAddress, getUserToken());
 
-            if (response.code() == HttpURLConnection.HTTP_OK) {
-                String content = response.body().string();
+        response = freight.execute();
 
-                Type t = new TypeToken<List<Freight>>() {
-                }.getType();
+        if (response.code() == HttpURLConnection.HTTP_OK) {
+            String content = response.body().string();
 
-                return new Gson().fromJson(content, t);
-            }
-            break;
+            Type t = new TypeToken<List<Freight>>() {
+            }.getType();
+
+            return new Gson().fromJson(content, t);
         }
-        ApiException ex = new ApiException();
-        ex.setStatusCode(response.code());
-        ex.setMessage(response.errorBody().string());
+        else{
+            //Mock provisorio
+            List<Freight> fake = new ArrayList<>();
+            for(int i = 0; i < 3; i++){
+                Freight f = new Freight();
+                f.IdAddress = 1;
+                f.IdCity = 1;
+                f.Period = i ;
+                f.Price = 10 + i;
+                fake.add(f);
+            }
+            return fake;
+        }
 
-        throw ex;
+//        ApiException ex = new ApiException();
+        //ex.setStatusCode(response.code());
+        //ex.setMessage(response.errorBody().string());
+
+  //      throw ex;
     }
 
 }
