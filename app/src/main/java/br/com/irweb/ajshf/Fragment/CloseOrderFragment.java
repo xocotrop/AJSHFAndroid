@@ -61,6 +61,7 @@ public class CloseOrderFragment extends Fragment {
     private RadioGroup radioGroup;
     private Spinner spinnerAddress;
     private TextView textPeriodo;
+    private TextView txtTxEntrega;
     private Spinner spinnerMethodPayment;
     private EditText editTextChangeMoney;
     private EditText editTextObservation;
@@ -241,7 +242,7 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mOrder.Period = 1;
-                textPeriodo.setText("Entre 12h - 17h30");
+                textPeriodo.setText("Entre 13h30 - 18h00");
             }
         });
 
@@ -249,7 +250,7 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mOrder.Period = 0;
-                textPeriodo.setText("Entre 8h - 12h");
+                textPeriodo.setText("Entre 9h - 12h");
             }
         });
 
@@ -257,7 +258,7 @@ public class CloseOrderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mOrder.Period = 2;
-                textPeriodo.setText("Entre 17h30 - 21h");
+                textPeriodo.setText("Após as 18h");
             }
         });
 
@@ -424,6 +425,7 @@ public class CloseOrderFragment extends Fragment {
         btnFinishOrder = (Button) v.findViewById(R.id.btn_finish_order);
         textPickup = (TextView) v.findViewById(R.id.text_pickup);
         textPeriodo = (TextView) v.findViewById(R.id.lbl_periodo_entrega);
+        txtTxEntrega = (TextView) v.findViewById(R.id.lbl_taxa_entrega);
         radioGroup = (RadioGroup) v.findViewById(R.id.group);
         imgPickupDelivery = (ImageView) v.findViewById(R.id.image_pickup_delivery);
         btnDate = (Button) v.findViewById(R.id.btn_date);
@@ -452,7 +454,7 @@ public class CloseOrderFragment extends Fragment {
                 try {
                     List<Freight> _freights = freightService.getFreights(mOrder.IdAddress);
                     if (_freights != null) {
-                        if (_freights == null) {
+                        if (freights == null) {
                             freights = _freights;
                         } else {
                             boolean found = false;
@@ -485,10 +487,44 @@ public class CloseOrderFragment extends Fragment {
     }
 
     private void updateFreight() {
+        Freight freight = null;
         if (radioManha.isChecked()) {
+            if(freights != null){
+                for (Freight f :
+                        freights) {
+                    if(f.Period == 0){
+                        freight = f;
+                        break;
+                    }
+                }
 
+            }
+        } else if (radioTarde.isChecked()) {
+            if(freights != null){
+                for (Freight f :
+                        freights) {
+                    if(f.Period == 1){
+                        freight = f;
+                        break;
+                    }
+                }
+
+            }
         } else {
+            if(freights != null){
+                for (Freight f :
+                        freights) {
+                    if(f.Period == 2){
+                        freight = f;
+                        break;
+                    }
+                }
 
+            }
+        }
+
+        if(freight != null){
+            txtTxEntrega.setText(String.format("Taxa entrega: R$ %.2f", freight.Price));
         }
     }
 

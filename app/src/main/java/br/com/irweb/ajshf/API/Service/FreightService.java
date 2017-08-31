@@ -72,25 +72,13 @@ public class FreightService {
 
             return new Gson().fromJson(content, t);
         }
-        else{
-            //Mock provisorio
-            List<Freight> fake = new ArrayList<>();
-            for(int i = 0; i < 3; i++){
-                Freight f = new Freight();
-                f.IdAddress = 1;
-                f.IdCity = 1;
-                f.Period = i ;
-                f.Price = 10 + i;
-                fake.add(f);
-            }
-            return fake;
-        }
 
-//        ApiException ex = new ApiException();
-        //ex.setStatusCode(response.code());
-        //ex.setMessage(response.errorBody().string());
 
-  //      throw ex;
+        ApiException ex = new ApiException();
+        ex.setStatusCode(response.code());
+        ex.setMessage(response.errorBody().string());
+
+        throw ex;
     }
 
 }

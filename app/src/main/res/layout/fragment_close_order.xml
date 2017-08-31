@@ -88,7 +88,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="false"
-                    android:text="Noite" />
+                    android:text="Fora de expediente" />
             </RadioGroup>
 
             <TextView
@@ -97,7 +97,15 @@
                 android:id="@+id/lbl_periodo_entrega"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Entre 8h - 12h" />
+                android:text="Entre 9h - 12h" />
+
+            <TextView
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:id="@+id/lbl_taxa_entrega"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Taxa entrega: R$ 0,00" />
 
             <TextView
                 android:id="@+id/lbl_address"
