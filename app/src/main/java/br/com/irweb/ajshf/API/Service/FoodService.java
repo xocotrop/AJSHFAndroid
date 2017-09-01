@@ -47,6 +47,10 @@ public class FoodService {
         userBusiness = new UserBusiness(context);
     }
 
+    private void reloadUser(){
+        user = AJSHFApp.getInstance().getUser();
+    }
+
     private String getUserToken() {
         if (userToken != null) {
             return userToken;
@@ -155,6 +159,7 @@ public class FoodService {
                 return null;
             } else if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 if (userBusiness.RefreshToken()) {
+                    reloadUser();
                     continue;
                 }
                 break;

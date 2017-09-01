@@ -57,10 +57,10 @@ public class FreightService {
         return userToken;
     }
 
-    public List<Freight> getFreights(int idAddress) throws IOException, ApiException {
+    public List<Freight> getFreights(int idAddress, int quantity) throws IOException, ApiException {
         Response<ResponseBody> response;
 
-        Call<ResponseBody> freight = freightClient.getFreight(idAddress, getUserToken());
+        Call<ResponseBody> freight = freightClient.getFreight(idAddress, quantity, getUserToken());
 
         response = freight.execute();
 

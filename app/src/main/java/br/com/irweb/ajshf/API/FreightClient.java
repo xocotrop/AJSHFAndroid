@@ -18,7 +18,7 @@ import retrofit2.http.Path;
 public interface FreightClient {
 
     @Headers("Content-type: application/json")
-    @GET("/api/Freight/{idAddress}")
-    Call<ResponseBody> getFreight(@Path("idAddress") int idAddress, @Header("Authorization") String authorization);
+    @GET("/api/Freight/{idAddress}/quantity/{quantity}")
+    Call<ResponseBody> getFreight(@Path("idAddress") int idAddress, @Path("quantity") int quantity, @Header("Authorization") String authorization);
 
 }

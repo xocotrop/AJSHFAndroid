@@ -38,6 +38,13 @@
             android:layout_height="wrap_content"
             android:text="#" />
 
+        <TextView
+            android:textSize="12sp"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Você pode ver seu pedido no site em 'Meus Pedidos'" />
+
         <Button
             android:layout_margin="10dp"
             android:id="@+id/btn_finish"

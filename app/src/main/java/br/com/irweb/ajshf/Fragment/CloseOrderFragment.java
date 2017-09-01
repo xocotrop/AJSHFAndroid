@@ -45,6 +45,7 @@ import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.Entities.AddressUserAJSHF;
 import br.com.irweb.ajshf.Entities.Freight;
+import br.com.irweb.ajshf.Entities.ItemOrder;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.PaymentMethod;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
@@ -55,6 +56,7 @@ import br.com.irweb.ajshf.R;
  */
 public class CloseOrderFragment extends Fragment {
 
+    //region var global
     private RadioButton radioManha;
     private RadioButton radioTarde;
     private RadioButton radioNoite;
@@ -89,6 +91,8 @@ public class CloseOrderFragment extends Fragment {
 
     private Handler handler;
 
+    private double totalFreight = 0;
+    //endregion
 
     public CloseOrderFragment() {
         // Required empty public constructor
@@ -138,7 +142,7 @@ public class CloseOrderFragment extends Fragment {
             mOrder.IdAddress = idAddress;
         }
         //ta dando pau isso
-        //loadingDialogFreight.show();
+
         new TaskFreigh().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -243,6 +247,7 @@ public class CloseOrderFragment extends Fragment {
             public void onClick(View v) {
                 mOrder.Period = 1;
                 textPeriodo.setText("Entre 13h30 - 18h00");
+                updateFreight();
             }
         });
 
@@ -251,6 +256,7 @@ public class CloseOrderFragment extends Fragment {
             public void onClick(View v) {
                 mOrder.Period = 0;
                 textPeriodo.setText("Entre 9h - 12h");
+                updateFreight();
             }
         });
 
@@ -259,6 +265,7 @@ public class CloseOrderFragment extends Fragment {
             public void onClick(View v) {
                 mOrder.Period = 2;
                 textPeriodo.setText("Após as 18h");
+                updateFreight();
             }
         });
 
@@ -275,6 +282,13 @@ public class CloseOrderFragment extends Fragment {
                     mOrder.IdNeighborhood = null;
                     mOrder.IdAddress = null;
                     textLblAddress.setVisibility(View.GONE);
+                    txtTxEntrega.setVisibility(View.INVISIBLE);
+                    radioNoite.setVisibility(View.INVISIBLE);
+
+                    if(radioNoite.isChecked()){
+                        radioManha.setChecked(true);
+                    }
+
                 } else {
                     textPickup.setVisibility(View.INVISIBLE);
                     mOrder.IdAddress = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdAddress;
@@ -284,7 +298,10 @@ public class CloseOrderFragment extends Fragment {
                     mOrder.IdAddress = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdAddress;
                     mOrder.IdNeighborhood = addressUserAJSHF.addresses.get(spinnerAddress.getSelectedItemPosition()).IdNeighborhood;
                     textLblAddress.setVisibility(View.VISIBLE);
+                    txtTxEntrega.setVisibility(View.VISIBLE);
+                    radioNoite.setVisibility(View.VISIBLE);
                 }
+                updateFreight();
             }
         });
 
@@ -316,8 +333,24 @@ public class CloseOrderFragment extends Fragment {
                 if (AddressSelected == 0) {
                     AddressSelected = mOrder.IdAddress;
                 } else if (!ThreadFreightRunning && AddressSelected != mOrder.IdAddress) {
-                    runFreight();
-                    //new TaskFreigh().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    AddressSelected = mOrder.IdAddress;
+
+
+                    boolean foundFreight = false;
+                    if (freights != null && freights.size() > 0) {
+                        for (Freight f :
+                                freights) {
+                            if (f.IdAddress == AddressSelected) {
+                                foundFreight = true;
+                                break;
+                            }
+                        }
+                        if (!foundFreight) {
+                            runFreight();
+                        } else {
+                            updateFreight();
+                        }
+                    }
                 }
             }
 
@@ -340,8 +373,9 @@ public class CloseOrderFragment extends Fragment {
             if (mOrder.ChangeOfMoney <= 0) {
                 Toast.makeText(getContext(), "Qual o valor para troco?", Toast.LENGTH_SHORT).show();
                 error = true;
-            } else if (mOrder.ChangeOfMoney < mOrder.TotalValue) {
-                Toast.makeText(getContext(), "Valor para troco menor que o Total.", Toast.LENGTH_SHORT).show();
+            } else if (mOrder.ChangeOfMoney < mOrder.TotalValue + totalFreight) {
+                double totalOrderWithFreight = mOrder.TotalValue + totalFreight;
+                Toast.makeText(getContext(), String.format("Valor para troco menor que o Total. (R$ %.2f)", totalOrderWithFreight), Toast.LENGTH_SHORT).show();
                 error = true;
             }
         }
@@ -437,6 +471,7 @@ public class CloseOrderFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             ThreadFreightRunning = true;
+            loadingDialogFreight.show();
         }
 
         @Override
@@ -452,7 +487,10 @@ public class CloseOrderFragment extends Fragment {
 
             if (mOrder.IdAddress != null) {
                 try {
-                    List<Freight> _freights = freightService.getFreights(mOrder.IdAddress);
+
+                    int quantity = getQuantityItemsInOrder(0);
+
+                    List<Freight> _freights = freightService.getFreights(mOrder.IdAddress, quantity);
                     if (_freights != null) {
                         if (freights == null) {
                             freights = _freights;
@@ -484,46 +522,64 @@ public class CloseOrderFragment extends Fragment {
             }
             return null;
         }
+
+        private int getQuantityItemsInOrder(int defaultValue) {
+
+            if(mOrder.Items != null){
+                int quantity = 0;
+                for (ItemOrder item:
+                     mOrder.Items) {
+                    if(!item.CustomMenu){
+                        quantity += item.Quantity;
+                    }
+                }
+                return quantity;
+            }
+
+            return defaultValue;
+        }
     }
 
     private void updateFreight() {
         Freight freight = null;
-        if (radioManha.isChecked()) {
-            if(freights != null){
-                for (Freight f :
-                        freights) {
-                    if(f.Period == 0){
-                        freight = f;
-                        break;
+        if(mOrder.IdAddress != null) {
+            if (radioManha.isChecked()) {
+                if (freights != null) {
+                    for (Freight f :
+                            freights) {
+                        if (f.Period == 0 && f.IdAddress == mOrder.IdAddress) {
+                            freight = f;
+                            break;
+                        }
                     }
-                }
 
-            }
-        } else if (radioTarde.isChecked()) {
-            if(freights != null){
-                for (Freight f :
-                        freights) {
-                    if(f.Period == 1){
-                        freight = f;
-                        break;
+                }
+            } else if (radioTarde.isChecked()) {
+                if (freights != null) {
+                    for (Freight f :
+                            freights) {
+                        if (f.Period == 1 && f.IdAddress == mOrder.IdAddress) {
+                            freight = f;
+                            break;
+                        }
                     }
-                }
 
-            }
-        } else {
-            if(freights != null){
-                for (Freight f :
-                        freights) {
-                    if(f.Period == 2){
-                        freight = f;
-                        break;
+                }
+            } else {
+                if (freights != null) {
+                    for (Freight f :
+                            freights) {
+                        if (f.Period == 2 && f.IdAddress == mOrder.IdAddress) {
+                            freight = f;
+                            break;
+                        }
                     }
-                }
 
+                }
             }
         }
-
-        if(freight != null){
+        if (freight != null) {
+            totalFreight = freight.Price;
             txtTxEntrega.setText(String.format("Taxa entrega: R$ %.2f", freight.Price));
         }
     }
