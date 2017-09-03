@@ -7,22 +7,28 @@
             android:icon="@drawable/dinner"
             android:title="Cardapio" />
         <item
+            android:visible="false"
             android:id="@+id/nav_orders"
             android:icon="@drawable/list"
             android:title="Meus Pedidos" />
         <item
+            android:visible="false"
             android:id="@+id/nav_profile"
             android:icon="@drawable/account"
             android:title="Meus dados" />
 
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Comunicação">
         <menu>
             <item
                 android:id="@+id/nav_contact"
                 android:icon="@drawable/ic_mail_outline_black_24dp"
                 android:title="Contato" />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_mail_outline_black_24dp"
+                android:title="Sobre" />
         </menu>
     </item>
 
