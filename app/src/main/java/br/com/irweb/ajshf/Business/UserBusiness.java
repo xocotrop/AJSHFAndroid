@@ -112,7 +112,7 @@ public class UserBusiness {
         return false;
     }
 
-    public boolean RefreshToken() throws ApiException {
+    public boolean RefreshToken() {
         //todo arrumar este método
         try {
             GenerateTokenResponse userAuth = service.RefreshToken();

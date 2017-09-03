@@ -32,51 +32,56 @@ import retrofit2.Retrofit;
  * Created by Igor on 22/05/2017.
  */
 
-public class FreightService {
+public class FreightService extends ServiceBase {
 
     private Retrofit retrofit;
     private FreightClient freightClient;
     private Context context;
-    private UserAuthAJSHF user;
-    private String userToken;
-    private UserBusiness userBusiness;
 
     public FreightService(Context context) {
+        super(context);
         this.context = context;
         retrofit = AJSHFApp.getInstance().getRetrofit();
         freightClient = retrofit.create(FreightClient.class);
-        user = AJSHFApp.getInstance().getUser();
-        userBusiness = new UserBusiness(context);
     }
 
-    private String getUserToken() {
-        if (userToken != null) {
-            return userToken;
-        }
-        userToken = String.format("%s %s", user.tokenType, user.accessToken);
-        return userToken;
-    }
 
     public List<Freight> getFreights(int idAddress, int quantity) throws IOException, ApiException {
         Response<ResponseBody> response;
 
-        Call<ResponseBody> freight = freightClient.getFreight(idAddress, quantity, getUserToken());
+        String message = "";
+        boolean errorRefreshToken = false;
 
-        response = freight.execute();
+        while (true) {
 
-        if (response.code() == HttpURLConnection.HTTP_OK) {
-            String content = response.body().string();
+            Call<ResponseBody> freight = freightClient.getFreight(idAddress, quantity, getUserToken());
 
-            Type t = new TypeToken<List<Freight>>() {
-            }.getType();
+            response = freight.execute();
 
-            return new Gson().fromJson(content, t);
+            if (response.code() == HttpURLConnection.HTTP_OK) {
+                String content = response.body().string();
+
+                Type t = new TypeToken<List<Freight>>() {
+                }.getType();
+
+                return new Gson().fromJson(content, t);
+            }else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
+                return null;
+            } else if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                if (RefreshToken()) {
+                    reloadUser();
+                    continue;
+                }
+                errorRefreshToken = true;
+                message = "Você precisa fazer o login novamente";
+                break;
+            }
+            break;
         }
 
-
         ApiException ex = new ApiException();
-        ex.setStatusCode(response.code());
-        ex.setMessage(response.errorBody().string());
+        ex.setStatusCode(errorRefreshToken ? 400 : response.code());
+        ex.setMessage(errorRefreshToken ? message :response.errorBody().string());
 
         throw ex;
     }

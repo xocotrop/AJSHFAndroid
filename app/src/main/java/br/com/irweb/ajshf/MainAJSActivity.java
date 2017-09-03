@@ -85,6 +85,10 @@ public class MainAJSActivity extends AppCompatActivity
                 transaction.replace(R.id.replace_fragment, frag, "menu");
                 transaction.commit();
             }
+        } else if (bus.className.equalsIgnoreCase(MenuFragment.class + "") || bus.className.equalsIgnoreCase(CloseOrderFragment.class + "")) {
+            if (bus.message.equalsIgnoreCase("tokenExpirado")) {
+                executeLogout();
+            }
         }
     }
 
@@ -128,13 +132,14 @@ public class MainAJSActivity extends AppCompatActivity
 
     }
 
-    public void hideFAB(){
+    public void hideFAB() {
         fab.hide();
     }
-    public void showFAB(){
+
+    public void showFAB() {
         updateViewCart();
 
-        if(AJSHFApp.getOrder().Items != null && AJSHFApp.getOrder().Items.size() > 0)
+        if (AJSHFApp.getOrder().Items != null && AJSHFApp.getOrder().Items.size() > 0)
             fab.show();
 
     }
@@ -248,15 +253,19 @@ public class MainAJSActivity extends AppCompatActivity
         } else if (id == R.id.nav_contact) {
 
         } else if (id == R.id.nav_logout) {
-            AJSHFApp.getInstance().Logout();
-            AJSHFApp.clearOrder();
-            ShowLoginActivity();
-            finish();
+            executeLogout();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void executeLogout() {
+        AJSHFApp.getInstance().Logout();
+        AJSHFApp.clearOrder();
+        ShowLoginActivity();
+        finish();
     }
 
 }

@@ -30,33 +30,19 @@ import retrofit2.Retrofit;
  * Created by Igor on 22/05/2017.
  */
 
-public class FoodService {
+public class FoodService extends ServiceBase {
 
     private Retrofit retrofit;
     private FoodClient foodClient;
     private Context context;
-    private UserAuthAJSHF user;
-    private String userToken;
-    private UserBusiness userBusiness;
 
     public FoodService(Context context) {
+        super(context);
+
         this.context = context;
+
         retrofit = AJSHFApp.getInstance().getRetrofit();
         foodClient = retrofit.create(FoodClient.class);
-        user = AJSHFApp.getInstance().getUser();
-        userBusiness = new UserBusiness(context);
-    }
-
-    private void reloadUser(){
-        user = AJSHFApp.getInstance().getUser();
-    }
-
-    private String getUserToken() {
-        if (userToken != null) {
-            return userToken;
-        }
-        userToken = String.format("%s %s", user.tokenType, user.accessToken);
-        return userToken;
     }
 
     public void addItemOrder(Food food) throws Exception {
@@ -120,7 +106,7 @@ public class FoodService {
 
                 return gson.fromJson(content, t);
             } else if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                if (userBusiness.RefreshToken()) {
+                if (RefreshToken()) {
                     continue;
                 }
                 break;
@@ -138,7 +124,8 @@ public class FoodService {
     public List<Food> GetFood() throws IOException, ApiException {
 
         Response<ResponseBody> response;
-
+        String message = "";
+        boolean errorRefreshToken = false;
         while (true) {
             Call<ResponseBody> foodClient = this.foodClient.GetFood(getUserToken());
 
@@ -158,18 +145,20 @@ public class FoodService {
             } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
                 return null;
             } else if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                if (userBusiness.RefreshToken()) {
+                if (RefreshToken()) {
                     reloadUser();
                     continue;
                 }
+                errorRefreshToken = true;
+                message = "Você precisa fazer o login novamente";
                 break;
             }
             break;
         }
 
         ApiException ex = new ApiException();
-        ex.setStatusCode(response.code());
-        ex.setMessage(response.errorBody().string());
+        ex.setStatusCode(errorRefreshToken ? 400 : response.code());
+        ex.setMessage(errorRefreshToken ? message : response.errorBody().string());
 
         throw ex;
     }

@@ -98,8 +98,6 @@ public class OrderService {
         } catch (IOException e) {
             e.printStackTrace();
             throw e;
-        } catch (ApiException e) {
-            e.printStackTrace();
         }
         return null;
     }

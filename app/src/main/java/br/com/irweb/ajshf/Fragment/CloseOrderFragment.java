@@ -466,7 +466,9 @@ public class CloseOrderFragment extends Fragment {
     }
 
     private class TaskFreigh extends AsyncTask<Void, Void, Void> {
-
+        private boolean error = false;
+        private String messageError;
+        private int mError = 0;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -480,6 +482,15 @@ public class CloseOrderFragment extends Fragment {
             loadingDialogFreight.hide();
             updateFreight();
             ThreadFreightRunning = false;
+            if(error){
+                Toast.makeText(getContext(), "Erro ao calcular o frete", Toast.LENGTH_SHORT).show();
+                if(mError == -1){
+                    MessageBus bus = new MessageBus();
+                    bus.className = CloseOrderFragment.class + "";
+                    bus.message = "tokenExpirado";
+                    EventBus.getDefault().post(bus);
+                }
+            }
         }
 
         @Override
@@ -517,6 +528,11 @@ public class CloseOrderFragment extends Fragment {
                     e.printStackTrace();
                 } catch (ApiException e) {
                     e.printStackTrace();
+                    error = true;
+                    messageError = e.getMessage();
+                    if(e.getStatusCode() == 400){
+                        mError = -1;
+                    }
                 }
 
             }

@@ -27,6 +27,8 @@ import android.widget.Toast;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,7 @@ import java.util.List;
 import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.API.Service.FoodService;
 import br.com.irweb.ajshf.Adapter.MenuItemViewHolderAdapter;
+import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Entities.Food;
 import br.com.irweb.ajshf.Helpers.StringHelper;
 import br.com.irweb.ajshf.MainAJSActivity;
@@ -234,6 +237,7 @@ public class MenuFragment extends Fragment {
 
     private class MenuTask extends AsyncTask<Object, Object, List<Food>> {
         private String messageError;
+        private int error = 0;
 
         @Override
         protected void onPostExecute(List<Food> foods) {
@@ -242,8 +246,16 @@ public class MenuFragment extends Fragment {
             if (foods != null) {
                 mFoods = foods;
                 setListInAdapter();
-            } else if (messageError == null || messageError.isEmpty()) {
+            } else if (messageError != null && !messageError.isEmpty()) {
                 Toast.makeText(getContext(), messageError, Toast.LENGTH_SHORT).show();
+
+                if(error == -1){
+                    MessageBus bus = new MessageBus();
+                    bus.className = MenuFragment.class + "";
+                    bus.message = "tokenExpirado";
+                    EventBus.getDefault().post(bus);
+                }
+
             }
 
             if(swipeRefreshLayout.isRefreshing())
@@ -277,6 +289,9 @@ public class MenuFragment extends Fragment {
 
             } catch (ApiException e) {
                 messageError = e.getMessage();
+                if(e.getStatusCode() == 400){
+                    error = -1;
+                }
             }
             return foods;
         }
