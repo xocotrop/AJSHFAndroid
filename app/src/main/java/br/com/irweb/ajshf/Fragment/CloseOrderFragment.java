@@ -141,8 +141,7 @@ public class CloseOrderFragment extends Fragment {
             int idAddress = addressUserAJSHF.addresses.get(position).IdAddress;
             mOrder.IdAddress = idAddress;
         }
-        //ta dando pau isso
-
+        
         new TaskFreigh().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
