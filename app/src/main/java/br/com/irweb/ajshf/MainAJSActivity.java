@@ -26,6 +26,7 @@ import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
+import br.com.irweb.ajshf.Fragment.AboutFragment;
 import br.com.irweb.ajshf.Fragment.CartFragment;
 import br.com.irweb.ajshf.Fragment.CloseOrderFragment;
 import br.com.irweb.ajshf.Fragment.MenuFragment;
@@ -129,6 +130,13 @@ public class MainAJSActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View v = navigationView.getHeaderView(0);
+        TextView userName = (TextView) v.findViewById(R.id.user_name);
+        TextView userMail = (TextView) v.findViewById(R.id.user_email);
+
+        userName.setText(AJSHFApp.getInstance().getUser().Name + " " + AJSHFApp.getInstance().getUser().LastName);
+        userMail.setText(AJSHFApp.getInstance().getUser().Email);
 
     }
 
@@ -254,6 +262,15 @@ public class MainAJSActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             executeLogout();
+        }
+        else if(id == R.id.nav_about){
+            Fragment fragment = AboutFragment.newInstance();
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+            transaction.replace(R.id.replace_fragment, fragment, "about");
+            transaction.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

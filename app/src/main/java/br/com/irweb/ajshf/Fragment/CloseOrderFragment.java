@@ -372,7 +372,7 @@ public class CloseOrderFragment extends Fragment {
             if (mOrder.ChangeOfMoney <= 0) {
                 Toast.makeText(getContext(), "Qual o valor para troco?", Toast.LENGTH_SHORT).show();
                 error = true;
-            } else if (mOrder.ChangeOfMoney < mOrder.TotalValue + totalFreight) {
+            } else if (!checkBoxPickup.isChecked() && mOrder.ChangeOfMoney < mOrder.TotalValue + totalFreight) {
                 double totalOrderWithFreight = mOrder.TotalValue + totalFreight;
                 Toast.makeText(getContext(), String.format("Valor para troco menor que o Total. (R$ %.2f)", totalOrderWithFreight), Toast.LENGTH_SHORT).show();
                 error = true;
