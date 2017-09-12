@@ -24,7 +24,7 @@ android {
     }
     productFlavors {
         debugConfig {
-
+            applicationIdSuffix '.debug'
         }
         releaseConfig {
 
