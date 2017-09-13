@@ -176,7 +176,7 @@ public class MenuFragment extends Fragment {
             txt.setText(Html.fromHtml(f.Description));
         }
         if (StringHelper.checkValidUrlImage(f.Image))
-            Picasso.with(getContext()).load(f.Image).placeholder(R.drawable.ic_update_black_24dp).into(img);
+            Picasso.with(getContext()).load(f.Image.replace(" ", "%20")).placeholder(R.drawable.ic_update_black_24dp).into(img);
         else
             Picasso.with(getContext()).load(R.drawable.ic_do_not_disturb_black_24dp).into(img);
 

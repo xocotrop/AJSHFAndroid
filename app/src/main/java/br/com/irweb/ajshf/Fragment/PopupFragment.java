@@ -85,7 +85,7 @@ public class PopupFragment extends Fragment {
                 text.setText(Html.fromHtml(food.Description));
             }
             if (StringHelper.checkValidUrlImage(food.Image)) {
-                Picasso.with(getContext()).load(food.Image).centerCrop().into(img, new Callback() {
+                Picasso.with(getContext()).load(food.Image.replace(" ", "%20")).centerCrop().into(img, new Callback() {
 
                     @Override
                     public void onSuccess() {

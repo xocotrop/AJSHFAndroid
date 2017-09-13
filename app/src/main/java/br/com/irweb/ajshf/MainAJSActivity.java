@@ -31,6 +31,7 @@ import br.com.irweb.ajshf.Fragment.CartFragment;
 import br.com.irweb.ajshf.Fragment.CloseOrderFragment;
 import br.com.irweb.ajshf.Fragment.MenuFragment;
 import br.com.irweb.ajshf.Fragment.OrderOkFragment;
+import br.com.irweb.ajshf.Utils.AndroidUtils;
 
 public class MainAJSActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

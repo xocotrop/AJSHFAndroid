@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.List;
 
 import br.com.irweb.ajshf.Entities.Food;
@@ -29,6 +30,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
     private List<Food> mFoods;
     private LayoutInflater inflater;
     private ItemAdapterBtnClick itemAdapterBtnClick;
+    private HashMap<Integer, Integer> qtyPosition = new HashMap<Integer, Integer>();
 
     public MenuItemViewHolderAdapter(Context context, List<Food> foods) {
         mContext = context;
@@ -61,8 +63,14 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
         Food f = mFoods.get(position);
 
         holder.title.setText(f.Title);
+        int qty = 0;
+        if (qtyPosition.containsKey(position)) {
+            qty = qtyPosition.get(position);
+        }
+        holder.itemQuantity.setText(qty + "");
 //        holder.img.setImageDrawable(null);
-        Picasso.with(mContext).load(f.Image).fit().into(holder.img);
+
+        Picasso.with(mContext).load(f.Image.replace(" ", "%20")).fit().into(holder.img);
 //        holder.btnAdd.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -118,6 +126,8 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
                 } else if (v.getId() == R.id.btn_plus) {
                     int qtd = 0;
                     String qtdStr = itemQuantity.getText().toString();
+
+
                     if (qtdStr.isEmpty()) {
                         qtdStr = "0";
                         qtd = Integer.valueOf(qtdStr);
@@ -126,6 +136,9 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
                         qtd = Integer.valueOf(qtdStr);
                         qtd++;
                     }
+
+                    qtyPosition.put(getAdapterPosition(), qtd);
+
                     itemQuantity.setText(qtd + "");
                 } else if (v.getId() == R.id.btn_minus) {
                     int qtd = 0;
@@ -139,6 +152,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
                             qtd = 0;
                         }
                     }
+                    qtyPosition.put(getAdapterPosition(), qtd);
                     itemQuantity.setText(qtd + "");
                 }
             } else if (v instanceof CardView) {
