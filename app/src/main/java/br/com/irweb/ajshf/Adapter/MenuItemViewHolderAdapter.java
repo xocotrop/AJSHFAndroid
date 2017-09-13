@@ -71,12 +71,6 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
 //        holder.img.setImageDrawable(null);
 
         Picasso.with(mContext).load(f.Image.replace(" ", "%20")).fit().into(holder.img);
-//        holder.btnAdd.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
     }
 
     @Override
@@ -143,9 +137,7 @@ public class MenuItemViewHolderAdapter extends RecyclerView.Adapter<MenuItemView
                 } else if (v.getId() == R.id.btn_minus) {
                     int qtd = 0;
                     String qtdStr = itemQuantity.getText().toString();
-                    if (qtdStr.isEmpty()) {
-                        qtdStr = "0";
-                    } else {
+                    if (!qtdStr.isEmpty()) {
                         qtd = Integer.valueOf(qtdStr);
                         qtd--;
                         if (qtd < 0) {

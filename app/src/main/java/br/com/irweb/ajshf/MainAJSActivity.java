@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -38,6 +40,8 @@ public class MainAJSActivity extends AppCompatActivity
 
     private TextView cartTotalView;
     private FloatingActionButton fab;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onStart() {
@@ -106,6 +110,8 @@ public class MainAJSActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +127,6 @@ public class MainAJSActivity extends AppCompatActivity
 
         transaction.add(R.id.replace_fragment, menuFragment, "menu");
         transaction.commit();
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
