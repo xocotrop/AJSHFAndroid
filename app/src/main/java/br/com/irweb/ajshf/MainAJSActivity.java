@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -67,6 +68,8 @@ public class MainAJSActivity extends AppCompatActivity
                 transaction.replace(R.id.replace_fragment, frag, "closerOrder");
                 transaction.addToBackStack("closeOrder");
                 transaction.commit();
+
+                mFirebaseAnalytics.setCurrentScreen(this, CloseOrderFragment.class.getName(), CloseOrderFragment.class.getName());
             }
         } else if (bus.className.equalsIgnoreCase(CloseOrderFragment.class + "")) {
             if (bus.message.equalsIgnoreCase("pedidoFechado")) {
@@ -77,6 +80,8 @@ public class MainAJSActivity extends AppCompatActivity
 
                 transaction.replace(R.id.replace_fragment, frag, "finishOrder");
                 transaction.commit();
+
+                mFirebaseAnalytics.setCurrentScreen(this, OrderOkFragment.class.getName(), OrderOkFragment.class.getName());
                 AJSHFApp.clearOrder();
                 updateViewCart();
             }
@@ -90,6 +95,8 @@ public class MainAJSActivity extends AppCompatActivity
 
                 transaction.replace(R.id.replace_fragment, frag, "menu");
                 transaction.commit();
+
+                mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
             }
         } else if (bus.className.equalsIgnoreCase(MenuFragment.class + "") || bus.className.equalsIgnoreCase(CloseOrderFragment.class + "")) {
             if (bus.message.equalsIgnoreCase("tokenExpirado")) {
@@ -244,6 +251,8 @@ public class MainAJSActivity extends AppCompatActivity
         transaction.replace(R.id.replace_fragment, fragment, "cart");
         transaction.addToBackStack("cart");
         transaction.commit();
+
+        mFirebaseAnalytics.setCurrentScreen(this, CartFragment.class.getName(), CartFragment.class.getName());
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -262,6 +271,8 @@ public class MainAJSActivity extends AppCompatActivity
             transaction.replace(R.id.replace_fragment, fragment, "menu");
             transaction.commit();
 
+            mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
+
         } else if (id == R.id.nav_orders) {
 
         } else if (id == R.id.nav_profile) {
@@ -279,6 +290,8 @@ public class MainAJSActivity extends AppCompatActivity
 
             transaction.replace(R.id.replace_fragment, fragment, "about");
             transaction.commit();
+
+            mFirebaseAnalytics.setCurrentScreen(this, AboutFragment.class.getName(), AboutFragment.class.getName());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
