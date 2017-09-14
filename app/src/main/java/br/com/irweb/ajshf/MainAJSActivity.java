@@ -128,6 +128,8 @@ public class MainAJSActivity extends AppCompatActivity
         transaction.add(R.id.replace_fragment, menuFragment, "menu");
         transaction.commit();
 
+        mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
