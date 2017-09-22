@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private UserBusiness business;
     private LoginButton loginButton;
     private CallbackManager callbackManager;
+    private Button createAccount;
 
     @Override
     protected void onStart() {
@@ -109,6 +110,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        createAccount = (Button) findViewById(R.id.create_account);
+
+        createAccount.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(getBaseContext(), RegisterActivity.class);
+
+                startActivity(it);
+            }
+        });
 
 
         business = new UserBusiness(this);
