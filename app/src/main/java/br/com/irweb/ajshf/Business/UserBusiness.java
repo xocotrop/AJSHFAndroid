@@ -46,6 +46,18 @@ public class UserBusiness {
         return null;
     }
 
+    public void Register(Client client) throws Exception {
+
+        try {
+
+            String id = service.createUser(client);
+
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
     public boolean Authentication(String login, String password) throws ApiException {
 
         try {
