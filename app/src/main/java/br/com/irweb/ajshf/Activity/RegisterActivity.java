@@ -60,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
                     client.ReceiveUpdates = atualizacoes.isChecked();
 
                     createAlertDialog();
-
+                    alertDialog.show();
                     new RegisterTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, client);
                 }
             }
@@ -109,7 +109,7 @@ public class RegisterActivity extends AppCompatActivity {
             strB.append("\nO campo confirmar senha e obrigatorio");
         }
         if (!senha.getText().toString().isEmpty() && !confirmarSenha.toString().isEmpty()) {
-            if (senha.getText().toString().equals(confirmarSenha.toString())) {
+            if (!senha.getText().toString().equals(confirmarSenha.getText().toString())) {
                 error = true;
                 strB.append("\nAs senhas precisam ser iguais");
             }
@@ -122,7 +122,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void createAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Aguarde");
         builder.setMessage("Realizando o cadastro");
         builder.setCancelable(false);
@@ -137,7 +137,6 @@ public class RegisterActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            alertDialog.show();
         }
 
 
@@ -170,7 +169,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void successRegister() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sucesso");
         builder.setMessage("Seu cadastro foi criado com sucesso, agora você já pode se logar no app =D");
         builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {

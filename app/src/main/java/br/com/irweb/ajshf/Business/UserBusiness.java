@@ -26,6 +26,7 @@ public class UserBusiness {
 
     private UserService service;
     private Context context;
+    private List<Address> cities;
 
 
     public UserBusiness(Context context) {
@@ -195,4 +196,7 @@ public class UserBusiness {
 
     }
 
+    public List<Address> getCities() throws Exception {
+        return service.getCities();
+    }
 }

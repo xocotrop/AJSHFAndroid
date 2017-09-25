@@ -30,6 +30,7 @@ import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Entities.Order;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import br.com.irweb.ajshf.Fragment.AboutFragment;
+import br.com.irweb.ajshf.Fragment.AddressFragment;
 import br.com.irweb.ajshf.Fragment.CartFragment;
 import br.com.irweb.ajshf.Fragment.CloseOrderFragment;
 import br.com.irweb.ajshf.Fragment.MenuFragment;
@@ -272,6 +273,18 @@ public class MainAJSActivity extends AppCompatActivity
             transaction.commit();
 
             mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
+
+        } else if(id == R.id.nav_address){
+
+            Fragment fragment = AddressFragment.newInstance();
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+            transaction.replace(R.id.replace_fragment, fragment, "address");
+            transaction.commit();
+
+            mFirebaseAnalytics.setCurrentScreen(this, AddressFragment.class.getName(), AddressFragment.class.getName());
 
         } else if (id == R.id.nav_orders) {
 

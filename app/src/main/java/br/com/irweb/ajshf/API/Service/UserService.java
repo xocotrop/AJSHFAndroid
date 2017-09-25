@@ -72,6 +72,31 @@ public class UserService {
         return null;
     }
 
+    public List<Address> getCities() throws Exception {
+
+        if (AJSHFApp.getInstance().getUser() != null) {
+            String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
+            Call<ResponseBody> cities = addressClient.getCities(auth);
+            Response<ResponseBody> response = cities.execute();
+
+            if (response.code() == HttpURLConnection.HTTP_OK) {
+                //todo trocar para cidades
+                Type t = new TypeToken<List<Address>>() {
+                }.getType();
+
+                return new Gson().fromJson(response.body().string(), t);
+
+            } else {
+                return null;
+            }
+        }
+        if (AJSHFApp.getInstance().getUser() == null) {
+            throw new Exception("Not logged");
+        }
+
+        return null;
+    }
+
     public AddressDataModel getAddressInfo(String CEP) throws Exception {
 
         if (AJSHFApp.getInstance().getUser() != null) {
