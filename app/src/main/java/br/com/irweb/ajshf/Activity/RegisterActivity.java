@@ -29,6 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister;
     private UserBusiness userBusiness;
     private CheckBox atualizacoes;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,9 @@ public class RegisterActivity extends AppCompatActivity {
                     client.Password = senha.getText().toString();
                     client.ConfirmPassword = confirmarSenha.getText().toString();
                     client.ReceiveUpdates = atualizacoes.isChecked();
+
+                    createAlertDialog();
+
                     new RegisterTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, client);
                 }
             }
@@ -117,42 +121,32 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
+    private void createAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        builder.setTitle("Aguarde");
+        builder.setMessage("Realizando o cadastro");
+        builder.setCancelable(false);
+        alertDialog = builder.create();
+    }
+
     private class RegisterTask extends AsyncTask<Client, Void, Boolean> {
 
         private String message;
-        private AlertDialog alertDialog;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
-            builder.setTitle("Aguarde");
-            builder.setMessage("Realizando o cadastro");
-            builder.setCancelable(false);
-            alertDialog = builder.create();
-
             alertDialog.show();
         }
+
 
         @Override
         protected void onPostExecute(Boolean aVoid) {
             super.onPostExecute(aVoid);
 
             if (aVoid) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
-                builder.setTitle("Sucesso");
-                builder.setMessage("Seu cadastro foi criado com sucesso, agora você já pode se logar no app =D");
-                builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        finish();
-                    }
-                });
-                builder.setCancelable(false);
-
-                builder.create().show();
+                successRegister();
             } else {
                 alertDialog.dismiss();
                 Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
@@ -173,6 +167,22 @@ public class RegisterActivity extends AppCompatActivity {
 
             return false;
         }
+    }
+
+    private void successRegister() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getBaseContext());
+        builder.setTitle("Sucesso");
+        builder.setMessage("Seu cadastro foi criado com sucesso, agora você já pode se logar no app =D");
+        builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        builder.setCancelable(false);
+
+        builder.create().show();
     }
 
 }

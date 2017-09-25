@@ -13,6 +13,7 @@ import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.API.Service.UserService;
 import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Entities.Address;
+import br.com.irweb.ajshf.Entities.AddressDataModel;
 import br.com.irweb.ajshf.Entities.AddressUserAJSHF;
 import br.com.irweb.ajshf.Entities.Client;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
@@ -44,6 +45,17 @@ public class UserBusiness {
         }
 
         return null;
+    }
+
+    public boolean insertAddress(Address address) throws Exception {
+
+        return service.createAddress(address);
+
+    }
+
+    public AddressDataModel getAddressInfo(String CEP) throws Exception {
+
+        return service.getAddressInfo(CEP);
     }
 
     public void Register(Client client) throws Exception {

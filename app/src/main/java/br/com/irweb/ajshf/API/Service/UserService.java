@@ -20,6 +20,7 @@ import br.com.irweb.ajshf.API.Entities.GenerateTokenResponse;
 import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Entities.Address;
+import br.com.irweb.ajshf.Entities.AddressDataModel;
 import br.com.irweb.ajshf.Entities.Client;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import okhttp3.ResponseBody;
@@ -46,8 +47,6 @@ public class UserService {
 
     }
 
-
-
     public List<Address> getAddress() throws Exception {
 
         if (AJSHFApp.getInstance().getUser() != null) {
@@ -55,7 +54,7 @@ public class UserService {
             Call<ResponseBody> address = addressClient.getAddress(auth);
             Response<ResponseBody> response = address.execute();
 
-            if(response.code() == HttpURLConnection.HTTP_OK){
+            if (response.code() == HttpURLConnection.HTTP_OK) {
 
                 Type t = new TypeToken<List<Address>>() {
                 }.getType();
@@ -63,7 +62,7 @@ public class UserService {
                 return new Gson().fromJson(response.body().string(), t);
 
             } else {
-                return  null;
+                return null;
             }
         }
         if (AJSHFApp.getInstance().getUser() == null) {
@@ -71,6 +70,49 @@ public class UserService {
         }
 
         return null;
+    }
+
+    public AddressDataModel getAddressInfo(String CEP) throws Exception {
+
+        if (AJSHFApp.getInstance().getUser() != null) {
+
+            String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
+            Call<ResponseBody> address = addressClient.getAddressInfo(CEP, auth);
+            Response<ResponseBody> response = address.execute();
+
+            if (response.code() == HttpURLConnection.HTTP_OK) {
+
+                Type t = new TypeToken<AddressDataModel>() {
+                }.getType();
+
+                return new Gson().fromJson(response.body().string(), t);
+
+            } else {
+                return null;
+            }
+        }
+        if (AJSHFApp.getInstance().getUser() == null) {
+            throw new Exception("Not logged");
+        }
+
+        return null;
+    }
+
+    public boolean createAddress(Address address) throws Exception {
+
+        if (AJSHFApp.getInstance().getUser() != null) {
+
+            String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
+            Call<ResponseBody> addressResult = addressClient.postAddress(address, auth);
+            Response<ResponseBody> response = addressResult.execute();
+
+            return response.code() == HttpURLConnection.HTTP_CREATED;
+        }
+        if (AJSHFApp.getInstance().getUser() == null) {
+            throw new Exception("Not logged");
+        }
+
+        return false;
     }
 
     public String createUser(Client client) throws Exception {

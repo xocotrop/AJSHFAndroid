@@ -19,7 +19,7 @@ public interface AddressClient {
 
     @Headers("Content-type: application/json")
     @GET("/api/Address/Data/{CEP}")
-    Call<ResponseBody> getAddress(@Path("CEP") String cep, @Header("Authorization") String authorization);
+    Call<ResponseBody> getAddressInfo(@Path("CEP") String cep, @Header("Authorization") String authorization);
 
     @Headers("Content-type: application/json")
     @POST("/api/Address")
