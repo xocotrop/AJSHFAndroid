@@ -1,10 +1,8 @@
 package br.com.irweb.ajshf.Fragment;
 
 
-import android.icu.text.DateFormat;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.BoolRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -48,7 +46,7 @@ public class AddressFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static AddressFragment newInstance(){
+    public static AddressFragment newInstance() {
         AddressFragment frag = new AddressFragment();
 
         return frag;

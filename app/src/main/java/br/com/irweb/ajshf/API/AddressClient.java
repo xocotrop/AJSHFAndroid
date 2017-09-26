@@ -30,6 +30,6 @@ public interface AddressClient {
     Call<ResponseBody> getAddress(@Header("Authorization") String authorization);
 
     @Headers("Content-type: application/json")
-    @GET("/api/Cities")
+    @GET("/api/Address/GetCities")
     Call<ResponseBody> getCities(@Header("Authorization") String authorization);
 }
