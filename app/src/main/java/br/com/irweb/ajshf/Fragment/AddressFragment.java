@@ -1,8 +1,10 @@
 package br.com.irweb.ajshf.Fragment;
 
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -13,8 +15,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import java.util.List;
+
 import br.com.irweb.ajshf.Business.UserBusiness;
 import br.com.irweb.ajshf.Entities.Address;
+import br.com.irweb.ajshf.Entities.AddressDataModel;
+import br.com.irweb.ajshf.Entities.Neighborhood;
 import br.com.irweb.ajshf.Entities.PaymentMethod;
 import br.com.irweb.ajshf.R;
 
@@ -72,14 +78,23 @@ public class AddressFragment extends Fragment {
         phoneNumber = (EditText) v.findViewById(R.id.phone_number);
         celNumber = (EditText) v.findViewById(R.id.cellphone_number);
 
-        initTasks();
-
         initButtons();
+
+        initTasks();
 
         return v;
     }
 
-    private void createDialog() {
+    private void createDialogSaveAddress() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Aguarde");
+        builder.setMessage("Estamos realizando o cadastro do endereço");
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void createDialogLoading() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Aguarde");
         builder.setMessage("Estamos realizando o cadastro do endereço");
@@ -94,7 +109,7 @@ public class AddressFragment extends Fragment {
             public void onClick(View v) {
                 Address addressModel = new Address();
                 if (validate(addressModel)) {
-                    createDialog();
+                    createDialogSaveAddress();
                     new RegisterAddressTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, addressModel);
                 }
             }
@@ -207,7 +222,14 @@ public class AddressFragment extends Fragment {
         }
     }
 
-    private class GetAddressInfoTask extends AsyncTask<Void, Void, Void> {
+    private void setAddressModel(AddressDataModel addressModel){
+        address.setText(addressModel.Address);
+        //fazer os set dos spinners
+
+
+    }
+
+    private class GetAddressInfoTask extends AsyncTask<String, Void, AddressDataModel> {
 
         @Override
         protected void onPreExecute() {
@@ -215,12 +237,48 @@ public class AddressFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(AddressDataModel addressDataModel) {
+            super.onPostExecute(addressDataModel);
+
+            setAddressModel(addressDataModel);
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected AddressDataModel doInBackground(String... params) {
+
+            try {
+                return userBusiness.getAddressInfo(params[0]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+    private class GetAllNeighborhood extends AsyncTask<Integer, Void, List<Neighborhood>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(List<Neighborhood> neighborhoodList) {
+            super.onPostExecute(neighborhoodList);
+
+//            setAddressModel(neighborhoodList);
+        }
+
+        @Override
+        protected List<Neighborhood> doInBackground(Integer... params) {
+
+            try {
+                return userBusiness.getAllNeighborhood(params[0]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             return null;
         }
     }

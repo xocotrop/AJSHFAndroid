@@ -15,7 +15,9 @@ import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.Entities.AddressDataModel;
 import br.com.irweb.ajshf.Entities.AddressUserAJSHF;
+import br.com.irweb.ajshf.Entities.City;
 import br.com.irweb.ajshf.Entities.Client;
+import br.com.irweb.ajshf.Entities.Neighborhood;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 
 /**
@@ -57,6 +59,11 @@ public class UserBusiness {
     public AddressDataModel getAddressInfo(String CEP) throws Exception {
 
         return service.getAddressInfo(CEP);
+    }
+
+    public List<Neighborhood> getAllNeighborhood(int idCity) throws Exception {
+
+        return service.getAllNeighborhood(idCity);
     }
 
     public void Register(Client client) throws Exception {
@@ -196,7 +203,7 @@ public class UserBusiness {
 
     }
 
-    public List<Address> getCities() throws Exception {
+    public List<City> getCities() throws Exception {
         return service.getCities();
     }
 }

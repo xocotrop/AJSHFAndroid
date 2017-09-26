@@ -21,7 +21,9 @@ import br.com.irweb.ajshf.API.Exception.ApiException;
 import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.Entities.AddressDataModel;
+import br.com.irweb.ajshf.Entities.City;
 import br.com.irweb.ajshf.Entities.Client;
+import br.com.irweb.ajshf.Entities.Neighborhood;
 import br.com.irweb.ajshf.Entities.UserAuthAJSHF;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -72,7 +74,7 @@ public class UserService {
         return null;
     }
 
-    public List<Address> getCities() throws Exception {
+    public List<City> getCities() throws Exception {
 
         if (AJSHFApp.getInstance().getUser() != null) {
             String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
@@ -80,8 +82,33 @@ public class UserService {
             Response<ResponseBody> response = cities.execute();
 
             if (response.code() == HttpURLConnection.HTTP_OK) {
-                //todo trocar para cidades
-                Type t = new TypeToken<List<Address>>() {
+
+                Type t = new TypeToken<List<City>>() {
+                }.getType();
+
+                return new Gson().fromJson(response.body().string(), t);
+
+            } else {
+                return null;
+            }
+        }
+        if (AJSHFApp.getInstance().getUser() == null) {
+            throw new Exception("Not logged");
+        }
+
+        return null;
+    }
+
+    public List<Neighborhood> getAllNeighborhood(int idCity) throws Exception {
+
+        if (AJSHFApp.getInstance().getUser() != null) {
+            String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
+            Call<ResponseBody> allNeighborhood = addressClient.getAllNeighborhood(idCity, auth);
+            Response<ResponseBody> response = allNeighborhood.execute();
+
+            if (response.code() == HttpURLConnection.HTTP_OK) {
+
+                Type t = new TypeToken<List<Neighborhood>>() {
                 }.getType();
 
                 return new Gson().fromJson(response.body().string(), t);
