@@ -8,4 +8,9 @@ public class City {
     public int Id;
     public String Cidade;
     public String Estado;
+
+    @Override
+    public String toString() {
+        return Cidade;
+    }
 }

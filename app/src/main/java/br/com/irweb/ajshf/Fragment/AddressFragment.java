@@ -1,27 +1,29 @@
 package br.com.irweb.ajshf.Fragment;
 
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.IntegerRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.irweb.ajshf.Business.UserBusiness;
 import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.Entities.AddressDataModel;
+import br.com.irweb.ajshf.Entities.City;
 import br.com.irweb.ajshf.Entities.Neighborhood;
-import br.com.irweb.ajshf.Entities.PaymentMethod;
 import br.com.irweb.ajshf.R;
 
 
@@ -42,10 +44,13 @@ public class AddressFragment extends Fragment {
     private EditText complement;
     private EditText phoneNumber;
     private EditText celNumber;
-    private String[] cities;
+    private List<City> cities;
     private Button btnRegister;
-
-    private AlertDialog dialog;
+    private List<Neighborhood> neighborhoods;
+    private int idCity;
+    private int idNeighborhood;
+    private AlertDialog dialogUpdateInfo;
+    private AlertDialog dialogSave;
     //endregion
 
     public AddressFragment() {
@@ -82,7 +87,69 @@ public class AddressFragment extends Fragment {
 
         initTasks();
 
+        initFunctions();
+
         return v;
+    }
+
+    private void initFunctions() {
+
+        cep.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus && !TextUtils.isEmpty(cep.getText().toString())){
+                    if(cep.getText().toString().length() != 8){
+                        cep.setError("CEP deve conter 8 dígitos");
+                        return;
+                    }
+                    createDialogLoading();
+                    new GetAddressInfoTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, cep.getText().toString());
+                }
+            }
+        });
+
+        neighborhood.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0){
+                    Toast.makeText(getContext(), "Selecione uma cidade", Toast.LENGTH_SHORT).show();
+
+                    return;
+                }
+
+                Neighborhood n = neighborhoods.get(position + 1);
+                idNeighborhood = n.Id;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(position == 0){
+                    Toast.makeText(getContext(), "Selecione uma cidade", Toast.LENGTH_SHORT).show();
+
+                    return;
+                }
+
+                City c = cities.get(position + 1);
+                idCity = c.Id;
+
+                createDialogLoading();
+
+                new GetAllNeighborhood().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void createDialogSaveAddress() {
@@ -90,17 +157,17 @@ public class AddressFragment extends Fragment {
         builder.setTitle("Aguarde");
         builder.setMessage("Estamos realizando o cadastro do endereço");
         builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        dialogSave = builder.create();
+        dialogSave.show();
     }
 
     private void createDialogLoading() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Aguarde");
-        builder.setMessage("Estamos realizando o cadastro do endereço");
+        builder.setMessage("Atualizando algumas informações");
         builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        dialogUpdateInfo = builder.create();
+        dialogUpdateInfo.show();
     }
 
     private void initButtons() {
@@ -108,6 +175,14 @@ public class AddressFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Address addressModel = new Address();
+                addressModel.Number = number.getText().toString();
+                addressModel.IdNeighborhood = idNeighborhood;
+                addressModel.Complement = complement.getText().toString();
+                addressModel.CEP = cep.getText().toString();
+                addressModel.Address = address.getText().toString();
+                addressModel.CellphoneNumber = celNumber.getText().toString();
+                addressModel.PhoneNumber = phoneNumber.getText().toString();
+
                 if (validate(addressModel)) {
                     createDialogSaveAddress();
                     new RegisterAddressTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, addressModel);
@@ -120,30 +195,55 @@ public class AddressFragment extends Fragment {
         boolean error = false;
         StringBuilder strB = new StringBuilder();
 
+        View viewFocus = null;
+
         if (addressModel.Address.isEmpty()) {
             error = true;
             strB.append("Endereço é obrigatório");
+            viewFocus = address;
+            address.setError("Endereço é obrigatório");
         }
 
         if (addressModel.CellphoneNumber.isEmpty()) {
             error = true;
             strB.append("\r\nNúmero de celular é obrigatório");
+            celNumber.setError("Número de celular é obrigatório");
+            if(viewFocus == null){
+                viewFocus = celNumber;
+            }
         }
         if (addressModel.CEP.isEmpty()) {
             error = true;
             strB.append("\r\nO CEP é obrigatório");
+            cep.setError("Cep é obrigatório");
+            if(viewFocus == null){
+                viewFocus = cep;
+            }
         }
         if (addressModel.Complement.isEmpty()) {
             error = true;
             strB.append("\r\nO Complemento é obrigatório");
+            complement.setError("Complemento é obrigatório");
+            if(viewFocus == null){
+                viewFocus = complement;
+            }
         }
-        if (addressModel.IdNeighborhood != 0) {
+        if (addressModel.IdNeighborhood == 0) {
             error = true;
-            strB.append("\r\nBairro é obrigatório");
+            strB.append("\r\nSelecione o bairro");
+
         }
         if (addressModel.Number.isEmpty()) {
             error = true;
             strB.append("\r\nNúmero da rua é obrigatório");
+            number.setError("Número da rua é obrigatório");
+            if(viewFocus == null){
+                viewFocus = number;
+            }
+        }
+
+        if(viewFocus != null){
+            viewFocus.setFocusable(true);
         }
 
         return !error;
@@ -155,16 +255,16 @@ public class AddressFragment extends Fragment {
 
 
     private void initAdapter() {
-        String[] getCities = getCities();
-        ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, getCities);
+        ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, cities);
         city.setAdapter(adapter);
 
-        ArrayAdapter adapterPayment = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, PaymentMethod.METHODS);
+        ArrayAdapter adapterPayment = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, new String[]{"Selecione uma cidade"});
         neighborhood.setAdapter(adapterPayment);
     }
 
-    public String[] getCities() {
-        return cities;
+    private void updateAdapterNeighborhood(){
+        ArrayAdapter neighborhoodAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, neighborhoods);
+        neighborhood.setAdapter(neighborhoodAdapter);
     }
 
     private class RegisterAddressTask extends AsyncTask<Address, Void, Boolean> {
@@ -178,7 +278,7 @@ public class AddressFragment extends Fragment {
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
 
-            dialog.dismiss();
+            dialogSave.dismiss();
 
         }
 
@@ -196,7 +296,7 @@ public class AddressFragment extends Fragment {
         }
     }
 
-    private class CityTask extends AsyncTask<Void, Void, Void> {
+    private class CityTask extends AsyncTask<Void, Void, List<City>> {
 
         @Override
         protected void onPreExecute() {
@@ -204,16 +304,27 @@ public class AddressFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            initAdapter();
+        protected void onPostExecute(List<City> cityList) {
+            super.onPostExecute(cityList);
+            if (cityList != null) {
+                cities = null;
+                cities = new ArrayList<>();
+                City c = new City();
+                c.Cidade = "Selecione";
+                c.Id = 0;
+                cities.add(c);
+                cities.addAll(cityList);
+                initAdapter();
+            } else {
+                Toast.makeText(getContext(), "Erro ao carregar as cidades", Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected List<City> doInBackground(Void... params) {
 
             try {
-                userBusiness.getCities();
+                return userBusiness.getCities();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -222,9 +333,9 @@ public class AddressFragment extends Fragment {
         }
     }
 
-    private void setAddressModel(AddressDataModel addressModel){
+    private void setAddressModel(AddressDataModel addressModel) {
         address.setText(addressModel.Address);
-        //fazer os set dos spinners
+
 
 
     }
@@ -240,7 +351,12 @@ public class AddressFragment extends Fragment {
         protected void onPostExecute(AddressDataModel addressDataModel) {
             super.onPostExecute(addressDataModel);
 
-            setAddressModel(addressDataModel);
+            if(addressDataModel != null){
+                setAddressModel(addressDataModel);
+            }
+
+            dialogUpdateInfo.dismiss();
+
         }
 
         @Override
@@ -267,7 +383,20 @@ public class AddressFragment extends Fragment {
         protected void onPostExecute(List<Neighborhood> neighborhoodList) {
             super.onPostExecute(neighborhoodList);
 
-//            setAddressModel(neighborhoodList);
+            if(neighborhoodList != null){
+                neighborhoods = null;
+                neighborhoods = new ArrayList<>();
+                Neighborhood n = new Neighborhood();
+                n.Bairro = "Selecione";
+                n.Id = 0;
+                neighborhoods.add(n);
+                neighborhoods.addAll(neighborhoodList);
+                updateAdapterNeighborhood();
+            } else {
+                Toast.makeText(getContext(), "Erro ao buscar os bairros da cidade", Toast.LENGTH_SHORT).show();
+            }
+
+            dialogUpdateInfo.dismiss();
         }
 
         @Override
