@@ -49,6 +49,7 @@ public class AddressFragment extends Fragment {
     private List<Neighborhood> neighborhoods;
     private int idCity;
     private int idNeighborhood;
+    private int tempIdNeighborhood;
     private AlertDialog dialogUpdateInfo;
     private AlertDialog dialogSave;
     //endregion
@@ -85,9 +86,10 @@ public class AddressFragment extends Fragment {
 
         initButtons();
 
+        initFunctions();
+
         initTasks();
 
-        initFunctions();
 
         return v;
     }
@@ -97,8 +99,8 @@ public class AddressFragment extends Fragment {
         cep.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(!hasFocus && !TextUtils.isEmpty(cep.getText().toString())){
-                    if(cep.getText().toString().length() != 8){
+                if (!hasFocus && !TextUtils.isEmpty(cep.getText().toString())) {
+                    if (cep.getText().toString().length() != 8) {
                         cep.setError("CEP deve conter 8 dígitos");
                         return;
                     }
@@ -107,17 +109,21 @@ public class AddressFragment extends Fragment {
                 }
             }
         });
-
+        final boolean[] init = {true};
         neighborhood.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0){
-                    Toast.makeText(getContext(), "Selecione uma cidade", Toast.LENGTH_SHORT).show();
+                if (position == 0) {
+                    if (init[0]) {
+                        init[0] = false;
+                        return;
+                    }
+                    Toast.makeText(getContext(), "Selecione um bairro", Toast.LENGTH_SHORT).show();
 
                     return;
                 }
 
-                Neighborhood n = neighborhoods.get(position + 1);
+                Neighborhood n = neighborhoods.get(position);
                 idNeighborhood = n.Id;
             }
 
@@ -126,23 +132,27 @@ public class AddressFragment extends Fragment {
 
             }
         });
-
+        final boolean[] initCity = {true};
         city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if(position == 0){
+                if (position == 0) {
+                    if (initCity[0]) {
+                        initCity[0] = false;
+                        return;
+                    }
                     Toast.makeText(getContext(), "Selecione uma cidade", Toast.LENGTH_SHORT).show();
 
                     return;
                 }
 
-                City c = cities.get(position + 1);
+                City c = cities.get(position);
                 idCity = c.Id;
 
                 createDialogLoading();
 
-                new GetAllNeighborhood().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new GetAllNeighborhood().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, idCity);
             }
 
             @Override
@@ -208,7 +218,7 @@ public class AddressFragment extends Fragment {
             error = true;
             strB.append("\r\nNúmero de celular é obrigatório");
             celNumber.setError("Número de celular é obrigatório");
-            if(viewFocus == null){
+            if (viewFocus == null) {
                 viewFocus = celNumber;
             }
         }
@@ -216,7 +226,7 @@ public class AddressFragment extends Fragment {
             error = true;
             strB.append("\r\nO CEP é obrigatório");
             cep.setError("Cep é obrigatório");
-            if(viewFocus == null){
+            if (viewFocus == null) {
                 viewFocus = cep;
             }
         }
@@ -224,7 +234,7 @@ public class AddressFragment extends Fragment {
             error = true;
             strB.append("\r\nO Complemento é obrigatório");
             complement.setError("Complemento é obrigatório");
-            if(viewFocus == null){
+            if (viewFocus == null) {
                 viewFocus = complement;
             }
         }
@@ -237,12 +247,12 @@ public class AddressFragment extends Fragment {
             error = true;
             strB.append("\r\nNúmero da rua é obrigatório");
             number.setError("Número da rua é obrigatório");
-            if(viewFocus == null){
+            if (viewFocus == null) {
                 viewFocus = number;
             }
         }
 
-        if(viewFocus != null){
+        if (viewFocus != null) {
             viewFocus.setFocusable(true);
         }
 
@@ -250,6 +260,7 @@ public class AddressFragment extends Fragment {
     }
 
     private void initTasks() {
+        createDialogLoading();
         new CityTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -262,9 +273,21 @@ public class AddressFragment extends Fragment {
         neighborhood.setAdapter(adapterPayment);
     }
 
-    private void updateAdapterNeighborhood(){
+    private void updateAdapterNeighborhood() {
         ArrayAdapter neighborhoodAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, neighborhoods);
         neighborhood.setAdapter(neighborhoodAdapter);
+
+        if (tempIdNeighborhood > 0) {
+            int position = 0;
+            for (int i = 0; i < neighborhoods.size(); i++) {
+                if (neighborhoods.get(i).Id == tempIdNeighborhood) {
+                    position = i;
+                    break;
+                }
+
+            }
+            neighborhood.setSelection(position, true);
+        }
     }
 
     private class RegisterAddressTask extends AsyncTask<Address, Void, Boolean> {
@@ -277,7 +300,11 @@ public class AddressFragment extends Fragment {
         @Override
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
+            if (success) {
 
+            } else {
+
+            }
             dialogSave.dismiss();
 
         }
@@ -318,6 +345,8 @@ public class AddressFragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), "Erro ao carregar as cidades", Toast.LENGTH_SHORT).show();
             }
+
+            dialogUpdateInfo.dismiss();
         }
 
         @Override
@@ -335,8 +364,24 @@ public class AddressFragment extends Fragment {
 
     private void setAddressModel(AddressDataModel addressModel) {
         address.setText(addressModel.Address);
+        City c = null;
+        int positionCity = 0;
+        tempIdNeighborhood = addressModel.IdNeighborhood;
+        for (int i = 0; i < cities.size(); i++) {
+            if (cities.get(i).Id == addressModel.IdCity) {
+                c = cities.get(i);
+                positionCity = i;
+                break;
+            }
+        }
 
+        if (c != null) {
 
+            city.setSelection(positionCity, true);
+
+            //createDialogLoading();
+            //new GetAllNeighborhood().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, c.Id);
+        }
 
     }
 
@@ -351,7 +396,7 @@ public class AddressFragment extends Fragment {
         protected void onPostExecute(AddressDataModel addressDataModel) {
             super.onPostExecute(addressDataModel);
 
-            if(addressDataModel != null){
+            if (addressDataModel != null) {
                 setAddressModel(addressDataModel);
             }
 
@@ -383,7 +428,7 @@ public class AddressFragment extends Fragment {
         protected void onPostExecute(List<Neighborhood> neighborhoodList) {
             super.onPostExecute(neighborhoodList);
 
-            if(neighborhoodList != null){
+            if (neighborhoodList != null) {
                 neighborhoods = null;
                 neighborhoods = new ArrayList<>();
                 Neighborhood n = new Neighborhood();

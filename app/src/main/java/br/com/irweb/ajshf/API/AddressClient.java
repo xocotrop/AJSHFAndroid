@@ -35,5 +35,5 @@ public interface AddressClient {
 
     @Headers("Content-type: application/json")
     @GET("/api/Address/city/{idCity}/GetAllNeighborhood")
-    Call<ResponseBody> getAllNeighborhood(@Path("CEP") int idCity, @Header("Authorization") String authorization);
+    Call<ResponseBody> getAllNeighborhood(@Path("idCity") int idCity, @Header("Authorization") String authorization);
 }

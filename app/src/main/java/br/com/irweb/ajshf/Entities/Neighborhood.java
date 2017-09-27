@@ -7,4 +7,9 @@ package br.com.irweb.ajshf.Entities;
 public class Neighborhood {
     public int Id;
     public String Bairro;
+
+    @Override
+    public String toString() {
+        return Bairro;
+    }
 }
