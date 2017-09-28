@@ -16,9 +16,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Business.UserBusiness;
 import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.Entities.AddressDataModel;
@@ -290,6 +293,17 @@ public class AddressFragment extends Fragment {
         }
     }
 
+    private void CloseOK(){
+        MessageBus bus = new MessageBus();
+        bus.className = AddressFragment.class + "";
+        bus.message = "enderecoCadastrado";
+        EventBus.getDefault().post(bus);
+
+        Toast.makeText(getContext(), "Endereço cadastrado com sucesso", Toast.LENGTH_SHORT).show();
+
+        //todo recarregar o endereço e adicionar na sessao de novo
+    }
+
     private class RegisterAddressTask extends AsyncTask<Address, Void, Boolean> {
 
         @Override
@@ -301,9 +315,9 @@ public class AddressFragment extends Fragment {
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
             if (success) {
-
+                CloseOK();
             } else {
-
+                Toast.makeText(getContext(), "Erro ao finalizar o cadastro", Toast.LENGTH_SHORT).show();
             }
             dialogSave.dismiss();
 

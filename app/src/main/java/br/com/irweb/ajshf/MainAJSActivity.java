@@ -103,6 +103,19 @@ public class MainAJSActivity extends AppCompatActivity
             if (bus.message.equalsIgnoreCase("tokenExpirado")) {
                 executeLogout();
             }
+        } else if (bus.className.equalsIgnoreCase(AddressFragment.class + "")) {
+            if (bus.message.equalsIgnoreCase("enderecoCadastrado")) {
+
+                Fragment frag = MenuFragment.newInstance();
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                transaction.replace(R.id.replace_fragment, frag, "menu");
+                transaction.commit();
+
+                mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
+            }
         }
     }
 
