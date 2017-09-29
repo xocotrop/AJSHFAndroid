@@ -294,14 +294,43 @@ public class AddressFragment extends Fragment {
     }
 
     private void CloseOK(){
+
         MessageBus bus = new MessageBus();
         bus.className = AddressFragment.class + "";
         bus.message = "enderecoCadastrado";
         EventBus.getDefault().post(bus);
 
         Toast.makeText(getContext(), "Endereço cadastrado com sucesso", Toast.LENGTH_SHORT).show();
+    }
 
-        //todo recarregar o endereço e adicionar na sessao de novo
+    private class GetAddressTask extends AsyncTask<Void,Void,Boolean>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean loadSuccess) {
+
+            super.onPostExecute(loadSuccess);
+            if(!loadSuccess){
+                Toast.makeText(getContext(), "Erro ao recarregar os endereços", Toast.LENGTH_SHORT).show();
+            }
+            dialogSave.dismiss();
+            CloseOK();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                userBusiness.loadAddressesInCache();
+                return  true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
     }
 
     private class RegisterAddressTask extends AsyncTask<Address, Void, Boolean> {
@@ -315,12 +344,12 @@ public class AddressFragment extends Fragment {
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
             if (success) {
-                CloseOK();
+                new GetAddressTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
             } else {
                 Toast.makeText(getContext(), "Erro ao finalizar o cadastro", Toast.LENGTH_SHORT).show();
+                dialogSave.dismiss();
             }
-            dialogSave.dismiss();
-
         }
 
         @Override

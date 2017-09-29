@@ -29,6 +29,7 @@ public class UserBusiness {
     private UserService service;
     private Context context;
     private List<Address> cities;
+    private List<Address> allAddress;
 
 
     public UserBusiness(Context context) {
@@ -61,6 +62,10 @@ public class UserBusiness {
         return service.getAddressInfo(CEP);
     }
 
+    public List<Address> getAllAddress() throws Exception {
+        return service.getAllAddress();
+    }
+
     public List<Neighborhood> getAllNeighborhood(int idCity) throws Exception {
 
         return service.getAllNeighborhood(idCity);
@@ -78,6 +83,18 @@ public class UserBusiness {
 
     }
 
+    public void loadAddressesInCache() throws Exception {
+        List<Address> addresses = service.getAddress();
+
+        AddressUserAJSHF addressUserAJSHF = createAddress(addresses);
+
+        String addressSerialize = new Gson().toJson(addressUserAJSHF);
+
+        AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERADDRESSTOKEN, addressSerialize);
+        AJSHFApp.getInstance().setADdressUserToken(addressUserAJSHF);
+
+    }
+
     public boolean Authentication(String login, String password) throws ApiException {
 
         try {
@@ -91,14 +108,7 @@ public class UserBusiness {
             AJSHFApp.getInstance().setUserToken(authAJSHF);
             AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERTOKEN, serialize);
 
-            List<Address> addresses = service.getAddress();
-
-            AddressUserAJSHF addressUserAJSHF = createAddress(addresses);
-
-            String addressSerialize = new Gson().toJson(addressUserAJSHF);
-
-            AJSHFApp.saveToPreferences(context, AJSHFApp.PREF_USERADDRESSTOKEN, addressSerialize);
-            AJSHFApp.getInstance().setADdressUserToken(addressUserAJSHF);
+            loadAddressesInCache();
 
             return true;
         } catch (ApiException e) {
@@ -206,4 +216,5 @@ public class UserBusiness {
     public List<City> getCities() throws Exception {
         return service.getCities();
     }
+
 }

@@ -40,6 +40,7 @@ public class UserService {
     private AccountClient accountClient;
     private Context context;
     private AddressClient addressClient;
+    private List<Address> allAddress;
 
     public UserService(Context context) {
         this.context = context;
@@ -109,6 +110,31 @@ public class UserService {
             if (response.code() == HttpURLConnection.HTTP_OK) {
 
                 Type t = new TypeToken<List<Neighborhood>>() {
+                }.getType();
+
+                return new Gson().fromJson(response.body().string(), t);
+
+            } else {
+                return null;
+            }
+        }
+        if (AJSHFApp.getInstance().getUser() == null) {
+            throw new Exception("Not logged");
+        }
+
+        return null;
+    }
+
+    public List<Address> getAllAddress() throws Exception {
+        if (AJSHFApp.getInstance().getUser() != null) {
+
+            String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
+            Call<ResponseBody> address = addressClient.getAllAddress(auth);
+            Response<ResponseBody> response = address.execute();
+
+            if (response.code() == HttpURLConnection.HTTP_OK) {
+
+                Type t = new TypeToken<Address>() {
                 }.getType();
 
                 return new Gson().fromJson(response.body().string(), t);
@@ -277,4 +303,5 @@ public class UserService {
         throw exception;
 
     }
+
 }

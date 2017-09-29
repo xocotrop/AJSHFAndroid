@@ -144,9 +144,17 @@ public class MainAJSActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        MenuFragment menuFragment = MenuFragment.newInstance();
+        if(AJSHFApp.getInstance().getAddressUser() != null && AJSHFApp.getInstance().getAddressUser().addresses != null && AJSHFApp.getInstance().getAddressUser().addresses.size() > 0){
+            MenuFragment menuFragment = MenuFragment.newInstance();
 
-        transaction.add(R.id.replace_fragment, menuFragment, "menu");
+            transaction.add(R.id.replace_fragment, menuFragment, "menu");
+        } else {
+
+            AddressFragment addressFragment = AddressFragment.newInstance();
+
+            transaction.add(R.id.replace_fragment, addressFragment, "address");
+        }
+
         transaction.commit();
 
         mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
