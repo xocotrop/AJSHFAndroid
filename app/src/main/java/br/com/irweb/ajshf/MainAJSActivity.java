@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -33,9 +32,9 @@ import br.com.irweb.ajshf.Fragment.AboutFragment;
 import br.com.irweb.ajshf.Fragment.AddressFragment;
 import br.com.irweb.ajshf.Fragment.CartFragment;
 import br.com.irweb.ajshf.Fragment.CloseOrderFragment;
+import br.com.irweb.ajshf.Fragment.ListAddressFragment;
 import br.com.irweb.ajshf.Fragment.MenuFragment;
 import br.com.irweb.ajshf.Fragment.OrderOkFragment;
-import br.com.irweb.ajshf.Utils.AndroidUtils;
 
 public class MainAJSActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -116,6 +115,11 @@ public class MainAJSActivity extends AppCompatActivity
 
                 mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
             }
+        } else if (bus.className.equalsIgnoreCase(ListAddressFragment.class + "")) {
+            if (bus.message.equalsIgnoreCase("enderecoCadastrado")) {
+
+                openAddressFragment(bus.additionalInfo);
+            }
         }
     }
 
@@ -144,7 +148,7 @@ public class MainAJSActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        if(AJSHFApp.getInstance().getAddressUser() != null && AJSHFApp.getInstance().getAddressUser().addresses != null && AJSHFApp.getInstance().getAddressUser().addresses.size() > 0){
+        if (AJSHFApp.getInstance().getAddressUser() != null && AJSHFApp.getInstance().getAddressUser().addresses != null && AJSHFApp.getInstance().getAddressUser().addresses.size() > 0) {
             MenuFragment menuFragment = MenuFragment.newInstance();
 
             transaction.add(R.id.replace_fragment, menuFragment, "menu");
@@ -295,17 +299,9 @@ public class MainAJSActivity extends AppCompatActivity
 
             mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
 
-        } else if(id == R.id.nav_address){
+        } else if (id == R.id.nav_address) {
 
-            Fragment fragment = AddressFragment.newInstance();
-
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-            transaction.replace(R.id.replace_fragment, fragment, "address");
-            transaction.commit();
-
-            mFirebaseAnalytics.setCurrentScreen(this, AddressFragment.class.getName(), AddressFragment.class.getName());
+            openListFragment();
 
         } else if (id == R.id.nav_orders) {
 
@@ -315,8 +311,7 @@ public class MainAJSActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             executeLogout();
-        }
-        else if(id == R.id.nav_about){
+        } else if (id == R.id.nav_about) {
             Fragment fragment = AboutFragment.newInstance();
 
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -331,6 +326,30 @@ public class MainAJSActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void openAddressFragment(String idAddress) {
+        Fragment fragment = idAddress == null ? AddressFragment.newInstance() : AddressFragment.newInstance(idAddress);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        transaction.replace(R.id.replace_fragment, fragment, "address");
+        transaction.commit();
+
+        mFirebaseAnalytics.setCurrentScreen(this, AddressFragment.class.getName(), AddressFragment.class.getName());
+    }
+
+    private void openListFragment() {
+        Fragment fragment = ListAddressFragment.newInstance();
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        transaction.replace(R.id.replace_fragment, fragment, "listaddress");
+        transaction.commit();
+
+        mFirebaseAnalytics.setCurrentScreen(this, AddressFragment.class.getName(), AddressFragment.class.getName());
     }
 
     private void executeLogout() {

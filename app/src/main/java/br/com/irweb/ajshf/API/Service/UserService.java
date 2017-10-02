@@ -134,7 +134,7 @@ public class UserService {
 
             if (response.code() == HttpURLConnection.HTTP_OK) {
 
-                Type t = new TypeToken<Address>() {
+                Type t = new TypeToken<List<Address>>() {
                 }.getType();
 
                 return new Gson().fromJson(response.body().string(), t);

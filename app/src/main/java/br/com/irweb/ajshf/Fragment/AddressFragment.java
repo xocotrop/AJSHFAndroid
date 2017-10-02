@@ -21,6 +21,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.irweb.ajshf.Application.AJSHFApp;
 import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Business.UserBusiness;
 import br.com.irweb.ajshf.Entities.Address;
@@ -55,6 +56,9 @@ public class AddressFragment extends Fragment {
     private int tempIdNeighborhood;
     private AlertDialog dialogUpdateInfo;
     private AlertDialog dialogSave;
+
+    private Address userAddress;
+
     //endregion
 
     public AddressFragment() {
@@ -63,6 +67,17 @@ public class AddressFragment extends Fragment {
 
     public static AddressFragment newInstance() {
         AddressFragment frag = new AddressFragment();
+
+        return frag;
+    }
+
+    public static AddressFragment newInstance(String idAddress) {
+        AddressFragment frag = new AddressFragment();
+
+        Bundle b = new Bundle();
+        b.putString("idAddress", idAddress);
+
+        frag.setArguments(b);
 
         return frag;
     }
@@ -87,14 +102,40 @@ public class AddressFragment extends Fragment {
         phoneNumber = (EditText) v.findViewById(R.id.phone_number);
         celNumber = (EditText) v.findViewById(R.id.cellphone_number);
 
+        loadAddress();
+
         initButtons();
 
         initFunctions();
 
         initTasks();
 
-
         return v;
+    }
+
+    private void loadAddress() {
+        if (getArguments() != null) {
+            int idAddress = Integer.parseInt(getArguments().getString("idAddress"));
+            if (idAddress > 0) {
+                List<Address> addresses = AJSHFApp.getInstance().getAddressUser().addresses;
+                for (Address a :
+                        addresses) {
+                    if (a.IdAddress == idAddress) {
+                        userAddress = a;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(userAddress != null){
+            cep.setText(userAddress.CEP);
+            address.setText(userAddress.Address);
+            number.setText(userAddress.Number);
+            celNumber.setText(userAddress.CellphoneNumber);
+            phoneNumber.setText(userAddress.PhoneNumber);
+            complement.setText(userAddress.Complement);
+        }
     }
 
     private void initFunctions() {
@@ -272,6 +313,15 @@ public class AddressFragment extends Fragment {
         ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, cities);
         city.setAdapter(adapter);
 
+        if(userAddress != null){
+            for(int i = 0; i < cities.size(); i ++){
+                if (cities.get(i).Cidade.equals(userAddress.City)) {
+                    city.setSelection(i, true);
+                    break;
+                }
+            }
+        }
+
         ArrayAdapter adapterPayment = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, new String[]{"Selecione uma cidade"});
         neighborhood.setAdapter(adapterPayment);
     }
@@ -280,7 +330,17 @@ public class AddressFragment extends Fragment {
         ArrayAdapter neighborhoodAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, neighborhoods);
         neighborhood.setAdapter(neighborhoodAdapter);
 
-        if (tempIdNeighborhood > 0) {
+        if(userAddress != null){
+
+            for (int i = 0; i < neighborhoods.size(); i++) {
+                if (neighborhoods.get(i).Id == userAddress.IdNeighborhood) {
+                    neighborhood.setSelection(i, true);
+                    break;
+                }
+            }
+
+        }
+        else if (tempIdNeighborhood > 0) {
             int position = 0;
             for (int i = 0; i < neighborhoods.size(); i++) {
                 if (neighborhoods.get(i).Id == tempIdNeighborhood) {
@@ -293,7 +353,7 @@ public class AddressFragment extends Fragment {
         }
     }
 
-    private void CloseOK(){
+    private void CloseOK() {
 
         MessageBus bus = new MessageBus();
         bus.className = AddressFragment.class + "";
@@ -303,7 +363,7 @@ public class AddressFragment extends Fragment {
         Toast.makeText(getContext(), "Endereço cadastrado com sucesso", Toast.LENGTH_SHORT).show();
     }
 
-    private class GetAddressTask extends AsyncTask<Void,Void,Boolean>{
+    private class GetAddressTask extends AsyncTask<Void, Void, Boolean> {
 
         @Override
         protected void onPreExecute() {
@@ -314,7 +374,7 @@ public class AddressFragment extends Fragment {
         protected void onPostExecute(Boolean loadSuccess) {
 
             super.onPostExecute(loadSuccess);
-            if(!loadSuccess){
+            if (!loadSuccess) {
                 Toast.makeText(getContext(), "Erro ao recarregar os endereços", Toast.LENGTH_SHORT).show();
             }
             dialogSave.dismiss();
@@ -325,7 +385,7 @@ public class AddressFragment extends Fragment {
         protected Boolean doInBackground(Void... params) {
             try {
                 userBusiness.loadAddressesInCache();
-                return  true;
+                return true;
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -59,7 +59,7 @@ public class ItemAddressAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         MyViewHolder v = (MyViewHolder) holder;
 
         Address a = addresses.get(position);
-        String addressText = String.format("%s, %s - %s",a.Address, a.Address, a.Number, a.Neighborhood);
+        String addressText = String.format("%s, %s - %s",a.Address, a.Number, a.Neighborhood);
         v.txt.setText(addressText);
         v.txtCellNumber.setText(a.CellphoneNumber);
         v.txtCep.setText(a.CEP);
@@ -84,4 +84,6 @@ public class ItemAddressAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         }
     }
+
+
 }

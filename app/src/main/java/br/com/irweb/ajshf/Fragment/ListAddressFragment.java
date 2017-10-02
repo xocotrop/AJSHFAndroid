@@ -1,20 +1,28 @@
 package br.com.irweb.ajshf.Fragment;
 
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.tts.Voice;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
 import br.com.irweb.ajshf.Adapter.ItemAddressAdapter;
+import br.com.irweb.ajshf.Bus.MessageBus;
 import br.com.irweb.ajshf.Business.UserBusiness;
 import br.com.irweb.ajshf.Entities.Address;
 import br.com.irweb.ajshf.R;
@@ -34,6 +42,11 @@ public class ListAddressFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static ListAddressFragment newInstance(){
+        ListAddressFragment fragment = new ListAddressFragment();
+
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,6 +70,23 @@ public class ListAddressFragment extends Fragment {
         ItemAddressAdapter addressAdapter = new ItemAddressAdapter(getContext());
         recyclerView.setAdapter(addressAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), recyclerView, new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Address address = allAddress.get(position);
+                MessageBus bus = new MessageBus();
+                bus.className = ListAddressFragment.class + "";
+                bus.message = "openAddress";
+                bus.additionalInfo = address.IdAddress + "";
+                EventBus.getDefault().post(bus);
+            }
+
+            @Override
+            public void onLongItemClick(View view, int position) {
+
+            }
+        }));
 
     }
 
@@ -85,7 +115,7 @@ public class ListAddressFragment extends Fragment {
         recyclerView.setVisibility(View.INVISIBLE);
     }
 
-    private class GetAllAddress extends AsyncTask<Voice, Void, List<Address>> {
+    private class GetAllAddress extends AsyncTask<Void, Void, List<Address>> {
 
         @Override
         protected void onPreExecute() {
@@ -103,7 +133,7 @@ public class ListAddressFragment extends Fragment {
         }
 
         @Override
-        protected List<Address> doInBackground(Voice... params) {
+        protected List<Address> doInBackground(Void... params) {
 
             try {
                 return userBusiness.getAllAddress();
@@ -113,6 +143,50 @@ public class ListAddressFragment extends Fragment {
 
             return null;
         }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+
+        void onLongItemClick(View view, int position);
+    }
+
+    private class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
+        private OnItemClickListener mListener;
+
+        GestureDetector mGestureDetector;
+
+        public RecyclerItemClickListener(Context context, final RecyclerView recyclerView, OnItemClickListener listener) {
+            mListener = listener;
+            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (child != null && mListener != null) {
+                        mListener.onLongItemClick(child, recyclerView.getChildAdapterPosition(child));
+                    }
+                }
+            });
+        }
+
+        @Override public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
+            View childView = view.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
+                return true;
+            }
+            return false;
+        }
+
+        @Override public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) { }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent (boolean disallowIntercept){}
     }
 
 }
