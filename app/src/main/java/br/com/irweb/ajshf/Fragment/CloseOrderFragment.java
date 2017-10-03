@@ -136,12 +136,15 @@ public class CloseOrderFragment extends Fragment {
     }
 
     private void runFreight() {
+        if (addressUserAJSHF == null || addressUserAJSHF.addresses == null || addressUserAJSHF.addresses.size() == 0)
+            return;
+
         if (AddressSelected == 0) {
             int position = spinnerAddress.getSelectedItemPosition();
             int idAddress = addressUserAJSHF.addresses.get(position).IdAddress;
             mOrder.IdAddress = idAddress;
         }
-        
+
         new TaskFreigh().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -284,7 +287,7 @@ public class CloseOrderFragment extends Fragment {
                     txtTxEntrega.setVisibility(View.INVISIBLE);
                     radioNoite.setVisibility(View.INVISIBLE);
 
-                    if(radioNoite.isChecked()){
+                    if (radioNoite.isChecked()) {
                         radioManha.setChecked(true);
                     }
 
@@ -303,6 +306,11 @@ public class CloseOrderFragment extends Fragment {
                 updateFreight();
             }
         });
+
+        if (addressUserAJSHF == null || addressUserAJSHF.addresses == null || addressUserAJSHF.addresses.size() == 0) {
+            checkBoxPickup.setChecked(true);
+            checkBoxPickup.setEnabled(false);
+        }
 
         spinnerMethodPayment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -328,7 +336,7 @@ public class CloseOrderFragment extends Fragment {
                 mOrder.IdNeighborhood = addressUserAJSHF.addresses.get(position).IdNeighborhood;
 //                mOrder.IdCity = addressUserAJSHF.addresses.get(position).
 
-                //Fazer aqui a parte de ver o frete se precisa disparar a thread, se já está carregado em memoria este frete
+
                 if (AddressSelected == 0) {
                     AddressSelected = mOrder.IdAddress;
                 } else if (!ThreadFreightRunning && AddressSelected != mOrder.IdAddress) {
@@ -398,9 +406,13 @@ public class CloseOrderFragment extends Fragment {
     }
 
     private void initAdapter() {
-        String[] adrs = getAddresses();
-        ArrayAdapter adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, adrs);
-        spinnerAddress.setAdapter(adapter);
+        if (addressUserAJSHF != null && addressUserAJSHF.addresses != null && addressUserAJSHF.addresses.size() > 0) {
+            String[] adrs = getAddresses();
+            ArrayAdapter adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, adrs);
+            spinnerAddress.setAdapter(adapter);
+        } else {
+            spinnerAddress.setVisibility(View.GONE);
+        }
 
         ArrayAdapter adapterPayment = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, PaymentMethod.METHODS);
         spinnerMethodPayment.setAdapter(adapterPayment);
@@ -468,6 +480,7 @@ public class CloseOrderFragment extends Fragment {
         private boolean error = false;
         private String messageError;
         private int mError = 0;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -481,9 +494,9 @@ public class CloseOrderFragment extends Fragment {
             loadingDialogFreight.hide();
             updateFreight();
             ThreadFreightRunning = false;
-            if(error){
+            if (error) {
                 Toast.makeText(getContext(), "Erro ao calcular o frete", Toast.LENGTH_SHORT).show();
-                if(mError == -1){
+                if (mError == -1) {
                     MessageBus bus = new MessageBus();
                     bus.className = CloseOrderFragment.class + "";
                     bus.message = "tokenExpirado";
@@ -529,7 +542,7 @@ public class CloseOrderFragment extends Fragment {
                     e.printStackTrace();
                     error = true;
                     messageError = e.getMessage();
-                    if(e.getStatusCode() == 400){
+                    if (e.getStatusCode() == 400) {
                         mError = -1;
                     }
                 }
@@ -540,11 +553,11 @@ public class CloseOrderFragment extends Fragment {
 
         private int getQuantityItemsInOrder(int defaultValue) {
 
-            if(mOrder.Items != null){
+            if (mOrder.Items != null) {
                 int quantity = 0;
-                for (ItemOrder item:
-                     mOrder.Items) {
-                    if(!item.CustomMenu){
+                for (ItemOrder item :
+                        mOrder.Items) {
+                    if (!item.CustomMenu) {
                         quantity += item.Quantity;
                     }
                 }
@@ -557,7 +570,7 @@ public class CloseOrderFragment extends Fragment {
 
     private void updateFreight() {
         Freight freight = null;
-        if(mOrder.IdAddress != null) {
+        if (mOrder.IdAddress != null) {
             if (radioManha.isChecked()) {
                 if (freights != null) {
                     for (Freight f :

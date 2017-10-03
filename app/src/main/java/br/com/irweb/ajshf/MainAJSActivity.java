@@ -116,7 +116,7 @@ public class MainAJSActivity extends AppCompatActivity
                 mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
             }
         } else if (bus.className.equalsIgnoreCase(ListAddressFragment.class + "")) {
-            if (bus.message.equalsIgnoreCase("enderecoCadastrado")) {
+            if (bus.message.equalsIgnoreCase("openAddress")) {
 
                 openAddressFragment(bus.additionalInfo);
             }

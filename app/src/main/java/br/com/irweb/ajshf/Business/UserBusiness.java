@@ -57,6 +57,12 @@ public class UserBusiness {
 
     }
 
+    public boolean updateAddress(Address address) throws Exception {
+
+        return service.updateAddress(address);
+
+    }
+
     public AddressDataModel getAddressInfo(String CEP) throws Exception {
 
         return service.getAddressInfo(CEP);

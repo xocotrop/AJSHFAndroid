@@ -193,6 +193,23 @@ public class UserService {
         return false;
     }
 
+    public boolean updateAddress(Address address) throws Exception {
+
+        if (AJSHFApp.getInstance().getUser() != null) {
+
+            String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
+            Call<ResponseBody> addressResult = addressClient.putAddress(address.IdNeighborhood, address, auth);
+            Response<ResponseBody> response = addressResult.execute();
+
+            return response.code() == HttpURLConnection.HTTP_CREATED;
+        }
+        if (AJSHFApp.getInstance().getUser() == null) {
+            throw new Exception("Not logged");
+        }
+
+        return false;
+    }
+
     public String createUser(Client client) throws Exception {
         Call<ResponseBody> create = accountClient.createUser(client);
 

@@ -26,6 +26,10 @@ public interface AddressClient {
     Call<ResponseBody> postAddress(@Body Address address, @Header("Authorization") String authorization);
 
     @Headers("Content-type: application/json")
+    @POST("/api/Address/{id}")
+    Call<ResponseBody> putAddress(@Path("id") int id, @Body Address address, @Header("Authorization") String authorization);
+
+    @Headers("Content-type: application/json")
     @GET("/api/Address")
     Call<ResponseBody> getAddress(@Header("Authorization") String authorization);
 

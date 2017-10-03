@@ -128,7 +128,7 @@ public class AddressFragment extends Fragment {
             }
         }
 
-        if(userAddress != null){
+        if (userAddress != null) {
             cep.setText(userAddress.CEP);
             address.setText(userAddress.Address);
             number.setText(userAddress.Number);
@@ -313,8 +313,8 @@ public class AddressFragment extends Fragment {
         ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, cities);
         city.setAdapter(adapter);
 
-        if(userAddress != null){
-            for(int i = 0; i < cities.size(); i ++){
+        if (userAddress != null) {
+            for (int i = 0; i < cities.size(); i++) {
                 if (cities.get(i).Cidade.equals(userAddress.City)) {
                     city.setSelection(i, true);
                     break;
@@ -330,7 +330,7 @@ public class AddressFragment extends Fragment {
         ArrayAdapter neighborhoodAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, neighborhoods);
         neighborhood.setAdapter(neighborhoodAdapter);
 
-        if(userAddress != null){
+        if (userAddress != null) {
 
             for (int i = 0; i < neighborhoods.size(); i++) {
                 if (neighborhoods.get(i).Id == userAddress.IdNeighborhood) {
@@ -339,8 +339,7 @@ public class AddressFragment extends Fragment {
                 }
             }
 
-        }
-        else if (tempIdNeighborhood > 0) {
+        } else if (tempIdNeighborhood > 0) {
             int position = 0;
             for (int i = 0; i < neighborhoods.size(); i++) {
                 if (neighborhoods.get(i).Id == tempIdNeighborhood) {
@@ -416,7 +415,11 @@ public class AddressFragment extends Fragment {
         protected Boolean doInBackground(Address... params) {
 
             try {
-                userBusiness.insertAddress(params[0]);
+                if (userAddress != null) {
+                    userBusiness.updateAddress(params[0]);
+                } else {
+                    userBusiness.insertAddress(params[0]);
+                }
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
