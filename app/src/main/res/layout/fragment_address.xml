@@ -35,7 +35,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="CEP"
+                    android:inputType="number"
                     android:maxLines="1"
+                    android:maxLength="8"
                     android:text="" />
 
             </android.support.design.widget.TextInputLayout>
@@ -123,8 +125,8 @@
                     android:layout_height="wrap_content"
                     android:hint="Telefone"
                     android:imeActionId="@+id/complement"
-
                     android:imeOptions="actionUnspecified"
+                    android:inputType="phone"
                     android:maxLines="1"
                     android:text="" />
 
@@ -140,8 +142,8 @@
                     android:layout_height="wrap_content"
                     android:hint="Celular"
                     android:imeActionId="@+id/phone_number"
-
                     android:imeOptions="actionUnspecified"
+                    android:inputType="phone"
                     android:maxLines="1"
                     android:text="" />
 

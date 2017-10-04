@@ -5,7 +5,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -153,6 +156,24 @@ public class AddressFragment extends Fragment {
                 }
             }
         });
+        cep.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(cep.getText().length() == 8){
+                    address.requestFocus();
+                }
+            }
+        });
         final boolean[] init = {true};
         neighborhood.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -297,7 +318,7 @@ public class AddressFragment extends Fragment {
         }
 
         if (viewFocus != null) {
-            viewFocus.setFocusable(true);
+            viewFocus.requestFocus();// setFocusable(true);
         }
 
         return !error;

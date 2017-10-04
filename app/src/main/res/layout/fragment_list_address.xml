@@ -11,12 +11,27 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/address_list"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible">
+        android:layout_height="match_parent">
 
-    </android.support.v7.widget.RecyclerView>
+        <Button
+            android:id="@+id/btn_add_address"
+            android:layout_margin="10dp"
+            android:layout_gravity="center_horizontal"
+            android:text="ADICIONAR"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/address_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible">
+
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
 
 </FrameLayout>

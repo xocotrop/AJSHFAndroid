@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import org.greenrobot.eventbus.EventBus;
@@ -37,12 +38,13 @@ public class ListAddressFragment extends Fragment {
     private List<Address> allAddress;
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
+    private Button btnAddAddress;
 
     public ListAddressFragment() {
         // Required empty public constructor
     }
 
-    public static ListAddressFragment newInstance(){
+    public static ListAddressFragment newInstance() {
         ListAddressFragment fragment = new ListAddressFragment();
 
         return fragment;
@@ -58,6 +60,17 @@ public class ListAddressFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_list_address, container, false);
         progressBar = (ProgressBar) v.findViewById(R.id.progress);
         recyclerView = (RecyclerView) v.findViewById(R.id.address_list);
+        btnAddAddress = (Button) v.findViewById(R.id.btn_add_address);
+
+        btnAddAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MessageBus bus = new MessageBus();
+                bus.className = ListAddressFragment.class + "";
+                bus.message = "addAddress";
+                EventBus.getDefault().post(bus);
+            }
+        });
 
         initAdapter();
 
@@ -99,7 +112,7 @@ public class ListAddressFragment extends Fragment {
             allAddress = null;
             allAddress = addresses;
 
-            ((ItemAddressAdapter)recyclerView.getAdapter()).setAddresses(allAddress);
+            ((ItemAddressAdapter) recyclerView.getAdapter()).setAddresses(allAddress);
 
             showList();
         }
@@ -174,7 +187,8 @@ public class ListAddressFragment extends Fragment {
             });
         }
 
-        @Override public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
             View childView = view.findChildViewUnder(e.getX(), e.getY());
             if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
                 mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
@@ -183,10 +197,13 @@ public class ListAddressFragment extends Fragment {
             return false;
         }
 
-        @Override public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) { }
+        @Override
+        public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
+        }
 
         @Override
-        public void onRequestDisallowInterceptTouchEvent (boolean disallowIntercept){}
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        }
     }
 
 }

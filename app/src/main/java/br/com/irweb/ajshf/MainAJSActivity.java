@@ -1,5 +1,6 @@
 package br.com.irweb.ajshf;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +12,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -120,6 +122,9 @@ public class MainAJSActivity extends AppCompatActivity
 
                 openAddressFragment(bus.additionalInfo);
             }
+            else if(bus.message.equalsIgnoreCase("addAddress")) {
+                openAddressFragment(null);
+            }
         }
     }
 
@@ -146,22 +151,46 @@ public class MainAJSActivity extends AppCompatActivity
         });
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        final FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         if (AJSHFApp.getInstance().getAddressUser() != null && AJSHFApp.getInstance().getAddressUser().addresses != null && AJSHFApp.getInstance().getAddressUser().addresses.size() > 0) {
             MenuFragment menuFragment = MenuFragment.newInstance();
 
             transaction.add(R.id.replace_fragment, menuFragment, "menu");
+            transaction.commit();
+            mFirebaseAnalytics.setCurrentScreen(MainAJSActivity.this, MenuFragment.class.getName(), MenuFragment.class.getName());
         } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Endereço");
+            String str = String.format("Olá %s, tudo bem? Percebi que você não tem endereço cadastrado, e desta forma não podemos realizar entregas para você, mas mesmo assim você consegue fazer o pedido e ir retirar. Ou então crie um cadastro de endereço agora mesmo =)", AJSHFApp.getInstance().getUser().Name);
+            builder.setMessage(str);
+            builder.setCancelable(false);
+            builder.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    MenuFragment menuFragment = MenuFragment.newInstance();
 
-            AddressFragment addressFragment = AddressFragment.newInstance();
+                    transaction.add(R.id.replace_fragment, menuFragment, "menu");
+                    transaction.commit();
 
-            transaction.add(R.id.replace_fragment, addressFragment, "address");
+                    mFirebaseAnalytics.setCurrentScreen(MainAJSActivity.this, MenuFragment.class.getName(), MenuFragment.class.getName());
+                }
+            });
+            builder.setPositiveButton("Cadastrar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AddressFragment addressFragment = AddressFragment.newInstance();
+
+                    transaction.add(R.id.replace_fragment, addressFragment, "address");
+                    transaction.commit();
+
+                    mFirebaseAnalytics.setCurrentScreen(MainAJSActivity.this, AddressFragment.class.getName(), AddressFragment.class.getName());
+                }
+            });
+            builder.create().show();
+
         }
-
-        transaction.commit();
-
-        mFirebaseAnalytics.setCurrentScreen(this, MenuFragment.class.getName(), MenuFragment.class.getName());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -349,7 +378,7 @@ public class MainAJSActivity extends AppCompatActivity
         transaction.replace(R.id.replace_fragment, fragment, "listaddress");
         transaction.commit();
 
-        mFirebaseAnalytics.setCurrentScreen(this, AddressFragment.class.getName(), AddressFragment.class.getName());
+        mFirebaseAnalytics.setCurrentScreen(this, ListAddressFragment.class.getName(), ListAddressFragment.class.getName());
     }
 
     private void executeLogout() {

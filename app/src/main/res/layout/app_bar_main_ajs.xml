@@ -17,6 +17,7 @@
 
     <include layout="@layout/content_main_ajs" />
 
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -27,5 +28,4 @@
         app:fabSize="normal"
         android:tint="@android:color/white"
         app:srcCompat="@drawable/ic_cart" />
-
 </android.support.design.widget.CoordinatorLayout>
