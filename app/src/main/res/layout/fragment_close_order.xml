@@ -37,7 +37,7 @@
                 android:id="@+id/text_pickup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rua doutor Alexandre Gutierrez, 80 (Água Verde)"
+                android:text="Rua Chile, 1651 (Rebouças) - Loja Spartans (Em frente à Uni Curitiba)"
                 android:visibility="invisible" />
 
             <FrameLayout

@@ -198,10 +198,10 @@ public class UserService {
         if (AJSHFApp.getInstance().getUser() != null) {
 
             String auth = String.format("%s %s", AJSHFApp.getInstance().getUser().tokenType, AJSHFApp.getInstance().getUser().accessToken);
-            Call<ResponseBody> addressResult = addressClient.putAddress(address.IdNeighborhood, address, auth);
+            Call<ResponseBody> addressResult = addressClient.putAddress(address.IdAddress, address, auth);
             Response<ResponseBody> response = addressResult.execute();
 
-            return response.code() == HttpURLConnection.HTTP_CREATED;
+            return response.code() == HttpURLConnection.HTTP_NO_CONTENT;
         }
         if (AJSHFApp.getInstance().getUser() == null) {
             throw new Exception("Not logged");
@@ -232,7 +232,7 @@ public class UserService {
         }
     }
 
-    public Client getMe(String tokenType, String token) {
+    public Client getMe(String tokenType, String token) throws ApiException {
 
         String auth = String.format("%s %s", tokenType, token);
 
@@ -246,7 +246,7 @@ public class UserService {
                 }.getType();
                 return new Gson().fromJson(response.body().string(), t);
             } else {
-
+                throw new ApiException(response.errorBody().string());
             }
 
         } catch (IOException e) {

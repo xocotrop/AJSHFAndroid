@@ -393,10 +393,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             } else {
 
-                mPasswordView.requestFocus();
-
-                Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
-
+                if (tokenFacebook.isEmpty()) {
+                    mPasswordView.requestFocus();
+                    Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
+                }
             }
         }
 

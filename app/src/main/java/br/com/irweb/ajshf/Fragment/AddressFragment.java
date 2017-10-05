@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,7 +168,7 @@ public class AddressFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(cep.getText().length() == 8){
+                if (cep.getText().length() == 8) {
                     address.requestFocus();
                 }
             }
@@ -260,6 +259,9 @@ public class AddressFragment extends Fragment {
 
                 if (validate(addressModel)) {
                     createDialogSaveAddress();
+                    if (userAddress != null) {
+                        addressModel.IdAddress = userAddress.IdAddress;
+                    }
                     new RegisterAddressTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, addressModel);
                 }
             }
@@ -351,7 +353,7 @@ public class AddressFragment extends Fragment {
         ArrayAdapter neighborhoodAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, neighborhoods);
         neighborhood.setAdapter(neighborhoodAdapter);
 
-        if (userAddress != null) {
+        if (userAddress != null && tempIdNeighborhood == 0) {
 
             for (int i = 0; i < neighborhoods.size(); i++) {
                 if (neighborhoods.get(i).Id == userAddress.IdNeighborhood) {
@@ -379,8 +381,11 @@ public class AddressFragment extends Fragment {
         bus.className = AddressFragment.class + "";
         bus.message = "enderecoCadastrado";
         EventBus.getDefault().post(bus);
-
-        Toast.makeText(getContext(), "Endereço cadastrado com sucesso", Toast.LENGTH_SHORT).show();
+        if (userAddress != null) {
+            Toast.makeText(getContext(), "Endereço atualizado com sucesso", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Endereço cadastrado com sucesso", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private class GetAddressTask extends AsyncTask<Void, Void, Boolean> {
@@ -504,7 +509,13 @@ public class AddressFragment extends Fragment {
 
         if (c != null) {
 
-            city.setSelection(positionCity, true);
+            if (city.getSelectedItemPosition() == positionCity) {
+                createDialogLoading();
+
+                new GetAllNeighborhood().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, idCity);
+            } else {
+                city.setSelection(positionCity, true);
+            }
 
             //createDialogLoading();
             //new GetAllNeighborhood().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, c.Id);
@@ -524,10 +535,9 @@ public class AddressFragment extends Fragment {
             super.onPostExecute(addressDataModel);
 
             if (addressDataModel != null) {
+                dialogUpdateInfo.dismiss();
                 setAddressModel(addressDataModel);
             }
-
-            dialogUpdateInfo.dismiss();
 
         }
 

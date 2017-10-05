@@ -9,6 +9,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 /**
@@ -26,7 +27,7 @@ public interface AddressClient {
     Call<ResponseBody> postAddress(@Body Address address, @Header("Authorization") String authorization);
 
     @Headers("Content-type: application/json")
-    @POST("/api/Address/{id}")
+    @PUT("/api/Address/{id}")
     Call<ResponseBody> putAddress(@Path("id") int id, @Body Address address, @Header("Authorization") String authorization);
 
     @Headers("Content-type: application/json")
