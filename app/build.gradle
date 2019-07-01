@@ -5,9 +5,9 @@ android {
     signingConfigs {
         release {
             keyAlias 'key0'
-            keyPassword 'igor2076'
+            keyPassword '--'
             storeFile file('E:/Dropbox/Dropbox/Android/keystore/producao/ajs/ajshf.jks')
-            storePassword 'igor2076'
+            storePassword '--'
         }
     }
 
